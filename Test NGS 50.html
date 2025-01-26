@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест по NGS</title>
+    <style>
+        .back-to-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #007b55;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+.back-to-top:hover {
+    background-color: #005f3c;
+}
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f4;
+            color: #333;
+        }
+        header {
+            background-color: #007b55;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        .test-container {
+            padding: 20px;
+        }
+        .question-counter {
+            font-size: 18px;
+            color: #007b55;
+            margin-bottom: 20px;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .question-card {
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .question-card h3 {
+            color: #007b55;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        .answer-button {
+            background-color: #e0ece0;
+            color: #007b55;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            width: 100%;
+            text-align: left;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+        .answer-button:hover {
+            background-color: #007b55;
+            color: white;
+        }
+        .correct {
+            background-color: green !important;
+            color: white !important;
+        }
+        .incorrect {
+            background-color: red !important;
+            color: white !important;
+        }
+        .result {
+            text-align: center;
+            font-size: 24px;
+            margin-top: 20px;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .result button {
+            background-color: #007b55;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+        .result button:hover {
+            background-color: #005f3c;
+        }
+        .timer {
+            font-size: 18px;
+            color: #007b55;
+        }
+        .result-card {
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 500px;
+            text-align: center;
+        }
+        .result-card h2 {
+            color: #007b55;
+            margin-bottom: 20px;
+        }
+        .result-card p {
+            font-size: 20px;
+            margin: 10px 0;
+        }
+        .review-questions {
+            margin-top: 20px;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .review-question {
+            margin-bottom: 20px;
+        }
+        .review-question h3 {
+            color: #007b55;
+            margin-bottom: 10px;
+        }
+        .review-answer {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 8px;
+            background-color: #e0ece0;
+            color: #007b55;
+        }
+        .review-answer.correct {
+            background-color: green;
+            color: white;
+        }
+        .review-answer.incorrect {
+            background-color: red;
+            color: white;
+        }
+
+        /* Кнопка "Вверх" */
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #007b55;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: none;
+            font-size: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .back-to-top:hover {
+            background-color: #005f43;
+        }
+
+        /* Кнопка "Назад" */
+        .back-to-previous {
+            position: fixed;
+            bottom: 50%; /* Расположение по центру по высоте */
+            right: 20px; /* То же расстояние от правого края, что и у кнопки "Вверх" */
+            transform: translateY(50%); /* Центрирование по вертикали */
+            background-color: #007b55;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex; /* Всегда отображать кнопку */
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .back-to-previous:hover {
+            background-color: #005f43;
+        }
+
+        /* Адаптация для мобильных устройств */
+        @media (max-width: 600px) {
+            .question-card h3 {
+                font-size: 1em;
+            }
+            .answer-button {
+                font-size: 0.9em;
+                padding: 8px;
+            }
+            .result {
+                font-size: 20px;
+            }
+            .result button {
+                font-size: 0.9em;
+                padding: 8px 16px;
+            }
+            .back-to-top,
+            .back-to-previous {
+                bottom: 10px;
+                right: 10px;
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+            .back-to-previous {
+                bottom: 50%;
+                transform: translateY(50%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>NGS от БиоЛайн: проверь себя</h1>
+    </header>
+    <div class="test-container">
+        <div id="question-counter" class="question-counter">
+            <span>Вопрос 1 из 30</span>
+            <span class="timer">Время: 00:00</span>
+        </div>
+        <div id="question-card" class="question-card">
+            <h3 id="question-text"></h3>
+            <div id="answer-buttons"></div>
+        </div>
+    </div>
+    <div id="result" class="result" style="display: none;">
+        <div class="result-card">
+            <h2>Результат</h2>
+            <p id="result-text"></p>
+            <p id="time-text"></p>
+            <button onclick="restartTest()">Заново</button>
+            <button onclick="saveResult()">Сохранить результат</button>
+        </div>
+        <!-- Кнопка "Наверх" -->
+    <button class="back-to-top" onclick="scrollToTop()" style="display: none;">↑</button>
+        <div id="review-questions" class="review-questions">
+            <!-- Здесь будут отображаться все вопросы с ответами -->
+        </div>
+        <div style="text-align: center; margin-top: 20px;">
+            <button onclick="saveResult()">Сохранить результат</button>
+        </div>
+    </div>
+
+    <!-- Кнопка "Вверх" -->
+    <button class="back-to-top" onclick="scrollToTop()">↑</button>
+
+    <!-- Кнопка "Назад" -->
+    <button class="back-to-previous" onclick="history.back()">←</button>
+
+    <script>
+        // Функция для прокрутки вверх
+function scrollToTop() {
+    document.body.scrollTop = 0; // Для Safari
+    document.documentElement.scrollTop = 0; // Для Chrome, Firefox, IE и Opera
+}
+
+// Логика для отображения кнопки "Наверх" при прокрутке
+window.onscroll = function() {
+    const backToTopButton = document.querySelector('.back-to-top');
+    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+        backToTopButton.style.display = 'flex';
+    } else {
+        backToTopButton.style.display = 'none';
+    }
+};
+
+// Показываем кнопку "Наверх" при отображении результатов
+function showResult() {
+    const resultText = document.getElementById('result-text');
+    const timeText = document.getElementById('time-text');
+    const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+    const minutes = Math.floor(elapsedTime / 60);
+    const seconds = elapsedTime % 60;
+    const result = Math.round((correctAnswersCount / totalQuestions) * 100);
+
+    resultText.innerText = `Вы ответили правильно на ${result}% вопросов!`;
+    timeText.innerText = `Время прохождения теста: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+    document.getElementById('question-card').style.display = 'none';
+    document.getElementById('result').style.display = 'block';
+
+    // Показываем кнопку "Наверх"
+    const backToTopButton = document.querySelector('.back-to-top');
+    backToTopButton.style.display = 'flex';
+
+    // Отображаем все вопросы с ответами
+    const reviewQuestions = document.getElementById('review-questions');
+    reviewQuestions.innerHTML = '<h2>Результаты по вопросам:</h2>';
+    userAnswers.forEach((answer, index) => {
+        const reviewQuestion = document.createElement('div');
+        reviewQuestion.classList.add('review-question');
+        reviewQuestion.innerHTML = `
+            <h3>Вопрос ${index + 1}: ${answer.question}</h3>
+            ${questions[index].answers.map(a => {
+                const isCorrect = a.includes(' *');
+                const isSelected = a.replace(' *', '') === answer.selectedAnswer;
+                const className = isCorrect ? 'correct' : (isSelected && !answer.isCorrect ? 'incorrect' : '');
+                return `<div class="review-answer ${className}">${a.replace(' *', '')}</div>`;
+            }).join('')}
+        `;
+        reviewQuestions.appendChild(reviewQuestion);
+    });
+}
+        const questions = [
+            {
+                question: "Какой метод секвенирования позволяет одновременно анализировать миллионы фрагментов ДНК?",
+                answers: [
+                    "Секвенирование по Сэнгеру",
+                    "Пиросеквенирование",
+                    "Секвенирование нового поколения (NGS) *",
+                    "Кеплеровское секвенирование",
+                    "Капиллярное секвенирование",
+                    "Масс-спектрометрия",
+                    "Электрофоретическое секвенирование",
+                    "Флуоресцентное секвенирование",
+                    "Нанопоровое секвенирование"
+                ]
+            },
+            {
+                question: "Какой из следующих методов используется для анализа экспрессии генов с помощью NGS?",
+                answers: [
+                    "RNA-seq *",
+                    "Exome-seq",
+                    "Whole-genome sequencing",
+                    "ChIP-seq",
+                    "ATAC-seq",
+                    "Bisulfite-seq",
+                    "miRNA-seq",
+                    "Ribosome profiling",
+                    "Hi-C"
+                ]
+            },
+            {
+                question: "Какой из следующих методов позволяет анализировать малые РНК с помощью NGS?",
+                answers: [
+                    "miRNA-seq *",
+                    "RNA-seq",
+                    "Exome-seq",
+                    "ChIP-seq",
+                    "ATAC-seq",
+                    "Bisulfite-seq",
+                    "Ribosome profiling",
+                    "Hi-C",
+                    "Methyl-seq"
+                ]
+            },
+            {
+                question: "Какой из следующих методов используется для анализа профиля рибосом с помощью NGS?",
+                answers: [
+                    "Ribosome profiling *",
+                    "RNA-seq",
+                    "Exome-seq",
+                    "ChIP-seq",
+                    "ATAC-seq",
+                    "Bisulfite-seq",
+                    "miRNA-seq",
+                    "Hi-C",
+                    "Methyl-seq"
+                ]
+            },
+            {
+                question: "Какой из следующих методов позволяет анализировать транскриптом с помощью NGS?",
+                answers: [
+                    "RNA-seq *",
+                    "Exome-seq",
+                    "Whole-genome sequencing",
+                    "ChIP-seq",
+                    "ATAC-seq",
+                    "Bisulfite-seq",
+                    "miRNA-seq",
+                    "Ribosome profiling",
+                    "Hi-C"
+                ]
+            },
+            {
+                question: "Какой из следующих методов используется для анализа метилирования ДНК с помощью NGS?",
+                answers: [
+                    "Bisulfite-seq *",
+                    "RNA-seq",
+                    "Exome-seq",
+                    "ChIP-seq",
+                    "ATAC-seq",
+                    "miRNA-seq",
+                    "Ribosome profiling",
+                    "Hi-C",
+                    "Methyl-seq"
+                ]
+            },
+            {
+                question: "Какой из следующих методов позволяет анализировать структуру хроматина с помощью NGS?",
+                answers: [
+                    "ATAC-seq *",
+                    "ChIP-seq",
+                    "RNA-seq",
+                    "Exome-seq",
+                    "Bisulfite-seq",
+                    "miRNA-seq",
+                    "Ribosome profiling",
+                    "Hi-C",
+                    "Methyl-seq"
+                ]
+            },
+            {
+                question: "Какой из следующих методов используется для анализа взаимодействия белков с ДНК с помощью NGS?",
+                answers: [
+                    "ChIP-seq *",
+                    "RNA-seq",
+                    "Exome-seq",
+                    "ATAC-seq",
+                    "Bisulfite-seq",
+                    "miRNA-seq",
+                    "Ribosome profiling",
+                    "Hi-C",
+                    "Methyl-seq"
+                ]
+            },
+            {
+                question: "Какой из следующих методов позволяет анализировать взаимодействия между различными участками генома с помощью NGS?",
+                answers: [
+                    "Hi-C *",
+                    "ChIP-seq",
+                    "RNA-seq",
+                    "Exome-seq",
+                    "Bisulfite-seq",
+                    "miRNA-seq",
+                    "Ribosome profiling",
+                    "ATAC-seq",
+                    "Methyl-seq"
+                ]
+            },
+            {
+                question: "Какой метод используется для фрагментации ДНК при подготовке библиотек для NGS?",
+                answers: [
+                    "Электрофорез",
+                    "ПЦР",
+                    "Ультразвуковая обработка *",
+                    "Лигирование",
+                    "Гибридизация",
+                    "Центрифугирование",
+                    "Спектрофотометрия",
+                    "Флуоресцентная метка",
+                    "Иммуноферментный анализ"
+                ]
+            },
+            {
+                question: "Какой фермент используется для добавления аденинового 'хвоста' к 3'-концам фрагментов ДНК при подготовке библиотек?",
+                answers: [
+                    "ДНК-лигаза",
+                    "Taq-полимераза *",
+                    "Ревертаза",
+                    "Эндонуклеаза",
+                    "Экзонуклеаза",
+                    "Транспозаза",
+                    "ДНК-геликаза",
+                    "ДНК-топоизомераза",
+                    "Рибонуклеаза"
+                ]
+            },
+            {
+                question: "Как называются короткие синтетические олигонуклеотиды, присоединяемые к концам фрагментов ДНК для последующего секвенирования?",
+                answers: [
+                    "Праймеры",
+                    "Адаптеры *",
+                    "Пробки",
+                    "Метки",
+                    "Лигандры",
+                    "Промоторы",
+                    "Энхансеры",
+                    "Сайленсеры",
+                    "Интроны"
+                ]
+            },
+            {
+                question: "Какой метод используется для удаления фрагментов ДНК нежелательной длины при подготовке библиотек?",
+                answers: [
+                    "Магнитные шарики *",
+                    "Электрофорез",
+                    "ПЦР",
+                    "Центрифугирование",
+                    "Спектрофотометрия",
+                    "Флуоресцентная метка",
+                    "Иммуноферментный анализ",
+                    "Гель-фильтрация",
+                    "Диализ"
+                ]
+            },
+            {
+                question: "Какой этап подготовки библиотек включает в себя увеличение количества копий фрагментов ДНК?",
+                answers: [
+                    "Фрагментация",
+                    "Репарация концов",
+                    "Амплификация *",
+                    "Лигирование",
+                    "Гибридизация",
+                    "Центрифугирование",
+                    "Спектрофотометрия",
+                    "Флуоресцентная метка",
+                    "Иммуноферментный анализ"
+                ]
+            },
+            {
+                question: "Какой метод позволяет одновременно фрагментировать ДНК и присоединять адаптеры в одном этапе?",
+                answers: [
+                    "Тагментация *",
+                    "ПЦР",
+                    "Ультразвуковая обработка",
+                    "Лигирование",
+                    "Гибридизация",
+                    "Центрифугирование",
+                    "Спектрофотометрия",
+                    "Флуоресцентная метка",
+                    "Иммуноферментный анализ"
+                ]
+            },
+            {
+                question: "Какой метод используется для определения концентрации подготовленной библиотеки ДНК?",
+                answers: [
+                    "Спектрофлуориметрия *",
+                    "Электрофорез",
+                    "ПЦР",
+                    "Центрифугирование",
+                    "Спектрофотометрия",
+                    "Флуоресцентная метка",
+                    "Иммуноферментный анализ",
+                    "Гель-фильтрация",
+                    "Диализ"
+                ]
+            },
+            {
+                question: "Какой метод позволяет определить размер фрагментов ДНК в библиотеке?",
+                answers: [
+                    "Электрофорез *",
+                    "ПЦР",
+                    "Центрифугирование",
+                    "Спектрофотометрия",
+                    "Флуоресцентная метка",
+                    "Иммуноферментный анализ",
+                    "Гель-фильтрация",
+                    "Диализ",
+                    "Хроматография"
+                ]
+            },
+            {
+                question: "Какой тип адаптеров используется для различения нескольких образцов в одном секвенировании?",
+                answers: [
+                    "Индексированные адаптеры *",
+                    "Универсальные адаптеры",
+                    "Специфические адаптеры",
+                    "Лигандные адаптеры",
+                    "Промоторные адаптеры",
+                    "Энхансерные адаптеры",
+                    "Сайленсерные адаптеры",
+                    "Интронные адаптеры",
+                    "Экзонные адаптеры"
+                ]
+            },
+            {
+                question: "Какой фермент используется для присоединения адаптеров к фрагментам ДНК?",
+                answers: [
+                    "ДНК-лигаза *",
+                    "Taq-полимераза",
+                    "Ревертаза",
+                    "Эндонуклеаза",
+                    "Экзонуклеаза",
+                    "Транспозаза",
+                    "ДНК-геликаза",
+                    "ДНК-топоизомераза",
+                    "Рибонуклеаза"
+                ]
+            },
+            {
+                question: "Какой метод позволяет избежать искажений состава образца при амплификации библиотек?",
+                answers: [
+                    "Использование уникальных молекулярных идентификаторов (UMI) *",
+                    "Увеличение числа циклов ПЦР",
+                    "Применение высокотемпературной ПЦР",
+                    "Использование случайных праймеров",
+                    "Применение низкотемпературной ПЦР",
+                    "Увеличение концентрации дНТФ",
+                    "Применение длинных праймеров",
+                    "Использование коротких праймеров",
+                    "Применение модифицированных нуклеотидов"
+                ]
+            },
+            {
+                question: "Какой метод используется для подготовки библиотек малых РНК для секвенирования?",
+                answers: [
+                    "Использование специализированных наборов для малых РНК *",
+                    "Стандартный протокол ДНК-библиотеки",
+                    "Применение ревертазы без модификаций",
+                    "Использование случайных праймеров",
+                    "Применение высокотемпературной ПЦР",
+                    "Увеличение числа циклов ПЦР",
+                    "Применение низкотемпературной ПЦР",
+                    "Увеличение концентрации дНТФ",
+                    "Применение длинных праймеров"
+                ]
+            },
+            {
+                question: "Какой метод позволяет контролировать процесс синтеза белка in vivo с помощью NGS?",
+                answers: [
+                    "RIBO-seq *",
+                    "RNA-seq",
+                    "ChIP-seq",
+                    "ATAC-seq",
+                    "Bisulfite-seq",
+                    "miRNA-seq",
+                    "Exome-seq",
+                    "Whole-genome sequencing",
+                    "Hi-C"
+                ]
+            },
+            {
+                question: "Какой метод обогащения библиотек позволяет увеличить количество интересующих фрагментов ДНК в тысячи раз?",
+                answers: [
+                    "Таргетное обогащение *",
+                    "Фрагментация ДНК",
+                    "Лигирование адаптеров",
+                    "Амплификация ПЦР",
+                    "Гибридизация с зондами",
+                    "Секвенирование экзома",
+                    "Магнитная сепарация",
+                    "Ультразвуковая обработка",
+                    "Электрофорез"
+                ]
+            },
+            {
+                question: "Какой метод обогащения библиотек включает гибридизацию с зондами?",
+                answers: [
+                    "Гибридизационное обогащение *",
+                    "ПЦР-амплификация",
+                    "Фрагментация ДНК",
+                    "Лигирование адаптеров",
+                    "Секвенирование РНК",
+                    "Магнитная сепарация",
+                    "Ультразвуковая обработка",
+                    "Электрофорез",
+                    "Тагментация"
+                ]
+            },
+            {
+                question: "Какой тип библиотек обогащается с помощью гибридизации с зондами?",
+                answers: [
+                    "Экзомные библиотеки *",
+                    "Геномные библиотеки",
+                    "Митохондриальные библиотеки",
+                    "Рибосомные библиотеки",
+                    "Плазмидные библиотеки",
+                    "Метагеномные библиотеки",
+                    "Транскриптомные библиотеки",
+                    "Эпигеномные библиотеки",
+                    "Микробиомные библиотеки"
+                ]
+            },
+            {
+                question: "Какой метод обогащения библиотек использует специфические праймеры для амплификации целевых фрагментов ДНК?",
+                answers: [
+                    "Гибридизационный метод",
+                    "Ампликонный метод *",
+                    "Метод дробовика",
+                    "Метод обогащения зондов",
+                    "Метод магнитных шариков",
+                    "Метод гель-фильтрации",
+                    "Метод диализа",
+                    "Метод центрифугирования",
+                    "Метод спектрофотометрии"
+                ]
+            },
+            {
+                question: "Какой метод обогащения библиотек использует короткие зондовые молекулы для связывания с целевыми фрагментами ДНК?",
+                answers: [
+                    "Гибридизационный метод *",
+                    "Ампликонный метод",
+                    "Метод дробовика",
+                    "Метод обогащения зондов",
+                    "Метод магнитных шариков",
+                    "Метод гель-фильтрации",
+                    "Метод диализа",
+                    "Метод центрифугирования",
+                    "Метод спектрофотометрии"
+                ]
+            },
+            {
+                question: "Какой метод обогащения библиотек позволяет исследовать все возможные варианты целевых фрагментов ДНК?",
+                answers: [
+                    "Гибридизационный метод",
+                    "Ампликонный метод",
+                    "Метод дробовика *",
+                    "Метод обогащения зондов",
+                    "Метод магнитных шариков",
+                    "Метод гель-фильтрации",
+                    "Метод диализа",
+                    "Метод центрифугирования",
+                    "Метод спектрофотометрии"
+                ]
+            },
+            {
+                question: "Какой метод обогащения библиотек требует предварительного знания целевых последовательностей ДНК?",
+                answers: [
+                    "Гибридизационный метод *",
+                    "Ампликонный метод",
+                    "Метод дробовика",
+                    "Метод обогащения зондов",
+                    "Метод магнитных шариков",
+                    "Метод гель-фильтрации",
+                    "Метод диализа",
+                    "Метод центрифугирования",
+                    "Метод спектрофотометрии"
+                ]
+            },
+            {
+                question: "Какой метод обогащения библиотек позволяет исследовать только заранее определённые целевые фрагменты ДНК?",
+                answers: [
+                    "Гибридизационный метод",
+                    "Ампликонный метод *",
+                    "Метод дробовика",
+                    "Метод обогащения зондов",
+                    "Метод магнитных шариков",
+                    "Метод гель-фильтрации",
+                    "Метод диализа",
+                    "Метод центрифугирования",
+                    "Метод спектрофотометрии"
+                ]
+            },
+            {
+                question: "Какой метод обогащения библиотек может быть использован для анализа метагеномных образцов?",
+                answers: [
+                    "Гибридизационный метод",
+                    "Ампликонный метод *",
+                    "Метод дробовика",
+                    "Метод обогащения зондов",
+                    "Метод магнитных шариков",
+                    "Метод гель-фильтрации",
+                    "Метод диализа",
+                    "Метод центрифугирования",
+                    "Метод спектрофотометрии"
+                ]
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let correctAnswersCount = 0;
+        const totalQuestions = questions.length;
+        let startTime = Date.now();
+        let timerInterval;
+        const userAnswers = []; // Массив для хранения ответов пользователя
+
+        function startTest() {
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimer, 1000);
+            showQuestion();
+        }
+
+        function updateTimer() {
+            const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsedTime / 60);
+            const seconds = elapsedTime % 60;
+            document.querySelector('.timer').innerText = `Время: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function showQuestion() {
+            const questionCounter = document.getElementById('question-counter');
+            const questionText = document.getElementById('question-text');
+            const answerButtons = document.getElementById('answer-buttons');
+
+            questionCounter.querySelector('span:first-child').innerText = `Вопрос ${currentQuestionIndex + 1} из ${totalQuestions}`;
+            questionText.innerText = questions[currentQuestionIndex].question;
+
+            answerButtons.innerHTML = '';
+            const answers = shuffleArray(questions[currentQuestionIndex].answers);
+            answers.forEach(answer => {
+                const button = document.createElement('button');
+                button.innerText = answer.replace(' *', '');
+                button.classList.add('answer-button');
+                if (answer.includes(' *')) {
+                    button.dataset.correct = true;
+                }
+                button.addEventListener('click', selectAnswer);
+                answerButtons.appendChild(button);
+            });
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function selectAnswer(e) {
+            const selectedButton = e.target;
+            const isCorrect = selectedButton.dataset.correct === 'true';
+
+            // Сохраняем ответ пользователя
+            userAnswers[currentQuestionIndex] = {
+                question: questions[currentQuestionIndex].question,
+                selectedAnswer: selectedButton.innerText,
+                isCorrect: isCorrect,
+                correctAnswer: questions[currentQuestionIndex].answers.find(answer => answer.includes(' *')).replace(' *', '')
+            };
+
+            if (isCorrect) {
+                selectedButton.classList.add('correct');
+                correctAnswersCount++;
+            } else {
+                selectedButton.classList.add('incorrect');
+                const correctButton = document.querySelector('.answer-button[data-correct="true"]');
+                correctButton.classList.add('correct');
+            }
+
+            setTimeout(() => {
+                if (currentQuestionIndex < totalQuestions - 1) {
+                    currentQuestionIndex++;
+                    showQuestion();
+                } else {
+                    clearInterval(timerInterval);
+                    showResult();
+                }
+            }, 1500);
+        }
+
+        function showResult() {
+            const resultText = document.getElementById('result-text');
+            const timeText = document.getElementById('time-text');
+            const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsedTime / 60);
+            const seconds = elapsedTime % 60;
+            const result = Math.round((correctAnswersCount / totalQuestions) * 100);
+
+            resultText.innerText = `Вы ответили правильно на ${result}% вопросов!`;
+            timeText.innerText = `Время прохождения теста: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+            document.getElementById('question-card').style.display = 'none';
+            document.getElementById('result').style.display = 'block';
+
+            // Отображаем все вопросы с ответами
+            const reviewQuestions = document.getElementById('review-questions');
+            reviewQuestions.innerHTML = '<h2>Результаты по вопросам:</h2>';
+            userAnswers.forEach((answer, index) => {
+                const reviewQuestion = document.createElement('div');
+                reviewQuestion.classList.add('review-question');
+                reviewQuestion.innerHTML = `
+                    <h3>Вопрос ${index + 1}: ${answer.question}</h3>
+                    ${questions[index].answers.map(a => {
+                        const isCorrect = a.includes(' *');
+                        const isSelected = a.replace(' *', '') === answer.selectedAnswer;
+                        const className = isCorrect ? 'correct' : (isSelected && !answer.isCorrect ? 'incorrect' : '');
+                        return `<div class="review-answer ${className}">${a.replace(' *', '')}</div>`;
+                    }).join('')}
+                `;
+                reviewQuestions.appendChild(reviewQuestion);
+            });
+        }
+
+        function restartTest() {
+            currentQuestionIndex = 0;
+            correctAnswersCount = 0;
+            userAnswers.length = 0; // Очищаем массив ответов
+            document.getElementById('question-card').style.display = 'block';
+            document.getElementById('result').style.display = 'none';
+            startTest();
+        }
+
+        function closeTest() {
+            window.location.href = 'Start.html';
+        }
+
+        function saveResult() {
+    // Получаем весь HTML-код страницы
+    const htmlContent = `
+        <!DOCTYPE html>
+        <html lang="ru">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Результат теста</title>
+            <style>
+                ${Array.from(document.querySelectorAll('style')).map(style => style.innerHTML).join('\n')}
+            </style>
+        </head>
+        <body>
+            ${document.body.innerHTML}
+        </body>
+        </html>
+    `;
+
+    // Создаем ссылку для скачивания
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'Результат теста.html'; // Имя файла
+    link.click(); // Программно нажимаем на ссылку для скачивания
+}
+
+        startTest();
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</body>
+</html>

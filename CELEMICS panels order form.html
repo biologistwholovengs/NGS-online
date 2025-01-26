@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CELEMICS | БиоЛайн</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f4;
+            color: #333;
+        }
+        header {
+            background-color: #007b55;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #e0ece0;
+            padding: 10px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+        nav a {
+            text-decoration: none;
+            color: #007b55;
+            font-weight: bold;
+            padding: 5px 10px;
+        }
+        .banner {
+            background-image: url('https://www.celemics.com/wp-content/uploads/2023/05/ngs-target-enrichment-panel-min.jpg');
+            background-size: cover;
+            background-position: center;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+            position: relative;
+        }
+        .banner h1 {
+            font-size: 2em;
+            text-align: center;
+            padding: 0 20px;
+        }
+        .content {
+            padding: 20px;
+            position: relative;
+        }
+        .section {
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 1;
+        }
+        .section h2 {
+            color: #007b55;
+            margin-bottom: 10px;
+        }
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .feature {
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            flex: 1 1 calc(33.333% - 20px);
+            position: relative;
+            text-align: center;
+        }
+        .feature.full-width {
+            flex: 1 1 100%;
+        }
+        .feature h3 {
+            color: #007b55;
+        }
+        .feature button {
+            background-color: #007b55;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .feature button:hover {
+            background-color: #005f3c;
+        }
+        footer {
+            background-color: #007b55;
+            color: white;
+            text-align: center;
+            padding: 10px 20px;
+            position: relative;
+            z-index: 1;
+        }
+        footer p {
+            margin: 0;
+        }
+        @media (max-width: 768px) {
+            .banner h1 {
+                font-size: 1.5em;
+            }
+            .feature {
+                flex: 1 1 100%;
+            }
+            nav {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+            /* Новые стили с увеличенным отступом */
+    /* Сдвиг "О компании" с текстом */
+#about h2,
+#about p {
+    margin-left: 40px; /* Увеличено на 40px */
+}
+
+/* Сдвиг заголовка "Онкология" */
+#oncology h2 {
+    margin-left: 40px; /* Увеличено на 40px */
+}
+
+/* Сдвиг заголовка "Наследственные заболевания" */
+#hereditary h2 {
+    margin-left: 40px; /* Увеличено на 40px */
+}
+
+/* Сдвиг "Контакты" с содержимым */
+#contact h2,
+#contact p,
+#contact ul {
+    margin-left: 40px; /* Увеличено на 40px */
+}
+
+        /* Кнопка "Вверх" */
+        .scroll-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #007b55;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        .scroll-to-top:hover {
+            background-color: #005f3c;
+        }
+
+        /* Кнопка "Назад" */
+        .scroll-to-back {
+            position: fixed;
+            bottom: 50%; /* Расположение по центру по высоте */
+            right: 20px; /* То же расстояние от правого края, что и у кнопки "Вверх" */
+            transform: translateY(50%); /* Центрирование по вертикали */
+            background-color: #007b55;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex; /* Всегда отображать кнопку */
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        .scroll-to-back:hover {
+            background-color: #005f3c;
+        }
+
+        /* RUO текст */
+        .ruo-notice {
+            background-color: #e0ece0;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+            border-radius: 8px;
+            color: #007b55;
+            font-weight: bold;
+        }
+
+        /* Стили для формы создания панели */
+        .request-form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .request-form h2 {
+            font-size: 20px;
+            color: #555;
+            margin-top: 20px;
+        }
+        .request-form input, .request-form select, .request-form textarea, .request-form button {
+            width: calc(100% - 40px);
+            padding: 10px;
+            margin: 10px 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .request-form button {
+            background-color: #007b55;
+            color: white;
+            cursor: pointer;
+        }
+        .request-form button:hover {
+            background-color: #005f3c;
+        }
+        .request-form .note {
+            font-size: 14px;
+            color: #777;
+            margin-top: 5px;
+            margin-left: 20px;
+        }
+
+        /* Белая кнопка "Создать панель" */
+        .create-panel-button {
+            background-color: white;
+            color: #007b55;
+            padding: 15px 30px;
+            border: 2px solid #007b55;
+            border-radius: 25px; /* Скругление углов */
+            cursor: pointer;
+            font-size: 18px;
+            margin-top: 10px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .create-panel-button:hover {
+            background-color: #007b55;
+            color: white;
+        }
+
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90%;
+            overflow-y: auto;
+            position: relative;
+        }
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #333;
+        }
+        .close-modal:hover {
+            color: #007b55;
+        }
+    </style>
+    <!-- Подключаем pdf-lib -->
+    <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>CELEMICS: Инновационные NGS-решения</h1>
+        <button class="create-panel-button" onclick="showModal()">Создать панель</button>
+    </header>
+    <nav>
+        <a href="#about">О нас</a>
+        <a href="#oncology">Онкология</a>
+        <a href="#hereditary">Наследственные заболевания</a>
+        <a href="#contact">Контакты</a>
+    </nav>
+    <div class="banner">
+        <h1>Панели нового поколения для медицины и исследований</h1>
+    </div>
+    <div class="content">
+        <!-- Форма для создания панели (скрыта по умолчанию) -->
+        <div id="requestForm" class="request-form" style="display: none;">
+            <h2>Запрос на создание пользовательской панели</h2>
+            <input type="text" placeholder="Компания" id="company" required>
+            <input type="text" placeholder="Основной контакт" id="mainContact" required>
+            <input type="email" placeholder="Контактная информация (email)" id="contactInfo" required>
+            <input type="text" placeholder="Название дизайна" id="designName" required>
+            <input type="text" placeholder="Название заболевания (если есть)" id="diseaseName">
+            <select id="referenceVersion" required>
+                <option value="GRCh37">GRCh37 (hg19)</option>
+                <option value="GRCh38">GRCh38 (hg38)</option>
+            </select>
+            <select id="geneDatabase" required>
+                <option value="RefSeq">RefSeq</option>
+            </select>
+            <input type="number" placeholder="Homolog Cut-off" id="homologCutoff" value="0" required>
+            <select id="geneType" required>
+                <option value="CDS">Coding Sequence Only (CDS)</option>
+                <option value="CDS+UTR">Coding Sequence + UTR</option>
+            </select>
+            <input type="number" placeholder="Expand (base pairs)" id="expand" value="0" required>
+            <textarea placeholder="Список генов или NM ID (по одному на строку)" id="geneList" rows="5" required></textarea>
+            <textarea placeholder="Fusions: введите хромосому, начало и конец" id="fusionRegions" rows="3"></textarea>
+            <textarea placeholder="Hotspots: введите хромосому, начало и конец" id="hotspotRegions" rows="3"></textarea>
+            <textarea placeholder="Другие регионы: введите хромосому, начало и конец" id="otherRegions" rows="3"></textarea>
+            <textarea placeholder="Синтезируемые последовательности: введите имя и последовательность" id="synthesisSequences" rows="3"></textarea>
+            <textarea placeholder="Примечания" id="notes" rows="3"></textarea>
+            <button onclick="generatePDF()">Скачать PDF</button>
+        </div>
+
+        <!-- Кнопка "Вверх" -->
+        <button class="scroll-to-top" onclick="scrollToTop()">↑</button>
+
+        <!-- Кнопка "Назад" -->
+        <button class="scroll-to-back" onclick="history.back()">←</button>
+    </div>
+    <script>
+        // Логика для отображения кнопки "Вверх" при прокрутке
+        window.onscroll = function() {
+            const scrollToTopButton = document.querySelector('.scroll-to-top');
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                scrollToTopButton.style.display = 'flex';
+            } else {
+                scrollToTopButton.style.display = 'none';
+            }
+        };
+
+        // Функция для прокрутки вверх
+        function scrollToTop() {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }
+
+        // Функция для показа модального окна
+        function showModal() {
+            document.getElementById('requestForm').style.display = 'block';
+        }
+
+        // Функция для генерации PDF
+        async function generatePDF() {
+            const { PDFDocument, StandardFonts } = PDFLib;
+
+            const pdfDoc = await PDFDocument.create();
+            const page = pdfDoc.addPage();
+            const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+            const company = document.getElementById('company').value;
+            const mainContact = document.getElementById('mainContact').value;
+            const contactInfo = document.getElementById('contactInfo').value;
+
+            page.drawText(`Компания: ${company}`, { x: 50, y: 750, size: 12, font });
+            page.drawText(`Основной контакт: ${mainContact}`, { x: 50, y: 730, size: 12, font });
+            page.drawText(`Контактная информация: ${contactInfo}`, { x: 50, y: 710, size: 12, font });
+
+            const pdfBytes = await pdfDoc.save();
+            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'panel_request.pdf';
+            link.click();
+        }
+    </script>
+</body>
+</html>
+
+        <!-- Остальные разделы лендинга -->
+        <section id="about" class="section">
+            <h2>О компании</h2>
+            <p>Компания CELEMICS разрабатывает высококачественные панели для NGS (секвенирования нового поколения), предоставляя инструменты для онкологии, генетических заболеваний и других областей медицины.</p>
+        </section>
+        <section id="oncology" class="section">
+            <h2>Онкология</h2>
+            <div class="features">
+                <div class="feature">
+                    <h3>CancerScreen Focus Panel - RNA</h3>
+                    <p>9 генов, 32.1 Kb. Включена диагностика слияний генов.</p>
+                    <button onclick="showGenes('ABL1, ALK, FGFR2, FGFR3, NTRK1, NTRK2, NTRK3, RET, ROS1')">Список генов</button>
+                </div>
+                <div class="feature">
+                    <h3>CancerScreen Panel - Core</h3>
+                    <p>13 генов, 61 Kb. Whole CDS, Rearrangement.</p>
+                    <button onclick="showGenes('ALK, APC, BRAF, EGFR, ERBB2, KRAS, MET, NRAS, PIK3CA, RET, ROS1, SMAD4, TP53')">Список генов</button>
+                </div>
+                <div class="feature">
+                    <h3>CancerScreen Focus Panel - HRR</h3>
+                    <p>15 генов, 69.4 Kb.</p>
+                    <button onclick="showGenes('ARID1A, ATM, ATRX, BAP1, BLM, BRCA1, BRCA2, BRIP1, CHEK2, FANCC, MRE11, NBN, PALB2, RAD50, WRN')">Список генов</button>
+                </div>
+                <div class="feature">
+                    <h3>CancerScreen Panel - 50</h3>
+                    <p>54 гена, 197 Kb. Whole CDS, Rearrangement.</p>
+                    <button onclick="showGenes('ABL1, AKT1, ALK, APC, ATM, BRAF, BRCA1, BRCA2, CDH1, CDK4, CDK6, CDKN2A, CSF1R, CTNNB1, DDR2, EGFR, ERBB2, ERBB4, ESR1, FGFR1, FGFR2, FGFR3, GNA11, GNAQ, GNAS, HRAS, IDH1, IDH2, JAK2, KDR, KIT, KRAS, MAP2K1, MET, MLH1, MTOR, MYC, MYCN, NOTCH1, NRAS, NTRK1, PDGFRA, PIK3CA, PTCH1, PTEN, PTPN11, RB1, RET, ROS1, SMAD4, SMO, SRC, STK11, TP53')">Список генов</button>
+                </div>
+                <div class="feature">
+                    <h3>CancerScreen Panel - 100</h3>
+                    <p>99 генов, 299 Kb. CDS.</p>
+                    <button onclick="showGenes('ABL1, AKT1, AKT2, AKT3, ALK, APC, ARID1A, ARID1B, ARID2, ATM, ATRX, AURKA, AURKB, BARD1, BCL2, BLM, BMPR1A, BRAF, BRCA1, BRCA2, BRIP1, CDH1, CDK4, CDK6, CDKN2A, CHEK2, CSF1R, CTNNB1, DDR2, EGFR, EPCAM, EPHB4, ERBB2, ERBB3, ERBB4, EZH2, FBXW7, FGFR1, FGFR2, FGFR3, FLT3, GNA11, GNAQ, GNAS, HNF1A, HRAS, IDH1, IDH2, IGF1R, ITK, JAK1, JAK2, JAK3, KDR, KIT, KRAS, MDM2, MET, MLH1, MPL, MRE11, MSH2, MSH6, MTOR, MUTYH, MYB, MYC, MYCL, MYCN, MYD88, MYL1, MYLK, MYO18A, MYOD1, NAB2, NBN, NCOA3, NCOR1, NDUFC2, NEGR1, NF1, NOTCH1, NPM1, NRAS, NRG1, NSD1, NSD3, NTRK1, PALB2, PDGFRA, PDGFRB, PIK3CA, PIK3R1, PMS2, PRSS1, PTCH1, PTCH2, PTEN, PTPN11, RAD50, RAD51C, RAD51D, RB1, RET, ROS1, SLX4, SMAD4, SMARCB1, SMO, SRC, STK11, SYK, TERT, TOP1, TP53, VHL')">Список генов</button>
+                </div>
+                <div class="feature">
+                    <h3>CancerScreen Panel - 400</h3>
+                    <p>407 генов, 1,123 Kb. CDS.</p>
+                    <button onclick="showGenes('ABL1, ABL2, ADGRA2, AKT1, AKT2, AKT3, ALK, AMER1, APC, APCDD1, APEX1, APOB, APOBEC1, AR, ARAF, ARFRP1, ARID1A, ARID1B, ARID2, ASXL1, ATM, ATP11B, ATR, ATRX, AURKA, AURKB, AXIN1, AXL, B2M, B3GAT1, BACH1, BAP1, BARD1, BCL2, BCL6, BCL9, BCOR, BCR, BIRC2, BIRC3, BLM, BRAF, BRCA1, BRCA2, BRD2, BRD3, BRD4, BRIP1, BTG1, BTK, BTLA, CARD11, CASP5, CASP8, CBFB, CBL, CD274, CDK12, CDK4, CDK6, CDK8, CDKN1A, CDKN1B, CDKN2A, CDKN2B, CDKN2C, CDX2, CEBPA, CHD1, CHD2, CHD4, CHEK1, CHEK2, CHUK, CIC, CRBN, CREBBP, CRKL, CRLF2, CSF1R, CSF2, CSF2RA, CSF2RB, CSNK2A1, CTCF, CTLA4, CTNNA1, CTNNB1, CUL3, CUL4A, CUL4B, CXCL10, CXCL11, CXCL9, CXCR3, CYLD, CYP17A1, DAXX, DCUN1D1, DDR2, DICER1, DIS3, DNMT1, DNMT3A, DOCK2, DOT1L, EGFR, ELMO1, EML4, EMSY, EP300, EPHA3, EPHA5, EPHA6, EPHA7, EPHB1, EPHB4, EPHB6, ERBB2, ERBB3, ERBB4, ERCC1, ERCC2, ERG, ERRFI1, ESR1, ETV1, ETV4, ETV5, ETV6, EWSR1, EYA2, EZH2, FANCA, FANCC, FANCD2, FANCE, FANCF, FANCG, FANCI, FANCL, FANCM, FAS, FAT1, FAT3, FBXW7, FGF1, FGF10, FGF12, FGF14, FGF19, FGF2, FGF23, FGF3, FGF4, FGF6, FGF7, FGFR1, FGFR2, FGFR3, FGFR4, FH, FLCN, FLT1, FLT3, FLT4, FOXA1, FOXL2, FOXO3, FOXP1, FOXP3, FRS2, FUBP1, GABRA6, GAS6, GATA1, GATA2, GATA3, GATA4, GATA6, GID4, GLI1, GNA11, GNA13, GNAQ, GNAS, GRIN2A, GRM3, GSK3B, GUCY1A2, GZMA, GZMB, GZMH, H3F3A, HGF, HIST1H3B, HLA-A, HLA-B, HLA-C, HLA-DRA, HLA-E, HLA-F, HLA-G, HNF1A, HOXA3, HRAS, HSDB1, HSP90AA1, IDH1, IDH2, IDO1, IDO2, IFITM1, IFITM3, IFNA1, IFNB1, IFNG, IGF1, IGF1R, IGF2, IGF2R, IKBKE, IKZF1, IL12A, IL12B, IL2, IL23A, IL6, IL7R, INHBA, INPP4B, INSR, IRF2, IRF4, IRS1, IRS2, ITGAE, ITK, JAK1, JAK2, JAK3, JUN, KAT6A, KDM5A, KDM5C, KDM6A, KDR, KEAP1, KEL, KIT, KLF4, KLHL6, KMT2A, KMT2B, KMT2C, KMT2D, KNSTRN, KRAS, LAG3, LAMP1, LATS1, LATS2, LMO1, LRP1B, LRP6, LTK, LTN1, LYN, LZTR1, MAGI2, MAGOH, MALT1, MAML1, MAP2K1, MAP2K2, MAP2K4, MAP3K1, MAP3K13, MAP3K14, MAP3K4, MAPK1, MAPK3, MAX, MCL1, MDC1, MDM2, MDM4, MED12, MEF2B, MEF2C, MEN1, MET, MGA, MITF, MLH1, MLLT3, MPL, MRE11, MSH2, MSH3, MSH6, MST1, MST1R, MTMR11, MTOR, MTR, MUTYH, MYB, MYC, MYCL, MYCN, MYD88, MYL1, MYLK, MYO18A, MYOD1, NAB2, NBN, NCOA3, NCOR1, NDUFC2, NEGR1, NF1, NF2, NFE2L2, NFKBIA, NKX2-1, NKX2-8, NKX3-1, NOMO1, NOTCH1, NOTCH2, NOTCH3, NOTCH4, NPM1, NRAS, NRG1, NSD1, NSD3, NTRK1, NTRK2, NTRK3, NUP93, NUTM1, PAK1, PAK3, PAK5, PALB2, PARP1, PARP2, PARP3, PARP4, PAX3, PAX5, PAX7, PAX8, PBRM1, PCDH17, PDCD1, PDCD1LG2, PDE4D, PDGFRA, PDGFRB, PDK1, PDPK1, PGR, PHF6, PHLPP2, PHOX2B, PIK3C2B, PIK3C2G, PIK3C3, PIK3CA, PIK3CB, PIK3CD, PIK3CG, PIK3R1, PIK3R2, PIK3R3, PIM1, PKHD1, PLCG1, PLCG2, PLK2, PMAIP1, PMS1, PMS2, PNP, PNRC1, POLD1, POLE, PPARG, PPM1D, PPP2R1A, PPP2R2A, PPP6C, PRDM1, PREX2, PRF1, PRKAR1A, PRKCI, PRKDC, PRKN, PRPF40B, PRSS8, PTCH1, PTCH2, PTEN, PTK2, PTPN11, PTPRC, PTPRD, PTPRS, PTPRT, PUS3, QKI, RAB35, RAC1, RAC2, RAD17, RAD21, RAD50, RAD51, RAD51B, RAD51C, RAD51D, RAD52, RAD54L, RAF1, RANBP2, RARA, RASA1, RB1, RBM10, RBMXL1, RECQL4, REL, RET, RFX1, RHEB, RHOA, RHOB, RICTOR, RIT1, RNF19B, RNF43, ROBO1, ROBO2, ROS1, RPA1, RPS6KA4, RPS6KB1, RPS6KB2, RPTor, RUNX1, RUNX1T1, RUNX3, RYBP, SDHA, SDHAF2, SDHB, SDHC, SDHD, SEC31A, SEMA3A, SEMA3E, SET, SETBP1, SETD2, SF3A1, SF3B1, SH2B3, SH2D1A, SHQ1, SKP2, SLC22A9, SLIT2, SLITRK3, SLX4, SMAD2, SMAD3, SMAD4, SMAP1, SMARCA1, SMARCA4, SMARCB1, SMARCD1, SMC1A, SMC3, SRSF2, STAG1, STAG2, STAT3, STAT4, STAT5A, STAT5B, STC1, STK11, STK40, SUFU, SUZ12, SYK, TACC3, TAF1, TBX22, TBX3, TCF3, TCF7L2, TENT5C, TERC, TERT, TET1, TET2, TFE3, TFRC, TGFBR1, TGFBR2, TIAF1, TIGIT, TIPARP, TMEM127, TMPRSS2, TNF, TNFAIP3, TNFRSF14, TNFRSF18, TNFRSF4, TNFSF13B, TNKS, TNKS2, TOP1, TOP2A, TP53, TP63, TRAF2, TRAF7, TRRAP, TSC1, TSC2, TSHR, U2AF1, U2AF2, USP9X, VEGFA, VHL, VSIR, VTCN1, WNT1, WT1, WWP1, XBP1, XIAP, XPO1, XRCC2, XRCC3, YAP1, YES1, ZBTB2, ZBTB7A, ZFHX3, ZNF217, ZNF703, ZRSR2')">Список генов</button>
+                </div>
+                <div class="feature">
+                    <h3>CancerMaster Panel</h3>
+                    <p>524 гена, 2.5 Mb. Whole CDS, Custom regions of oncogenes, Immune response genes, and EBV & HPV viruses.</p>
+                    <button onclick="showGenes('ABL1, ABL2, ACVR1, ACVR1B, ADAM29, ADGRA2, AKT1, AKT2, AKT3, ALK, ALOX12B, ALOX15B, AMER1, APC, APCDD1, APEX1, APOB, APOBEC1, APOBEC3A, APOBEC3B, AR, ARAF, ARFRP1, ARID1A, ARID1B, ARID2, ASXL1, ATM, ATP11B, ATR, ATRX, AURKA, AURKB, AXIN1, AXL, B2M, B3GAT1, BACH1, BAP1, BARD1, BCL2, BCL2A1, BCL2L1, BCL2L2, BCL6, BCL9, BCOR, BCORL1, BCR, BIRC2, BIRC3, BLM, BRAF, BRCA1, BRCA2, BRD2, BRD3, BRD4, BRIP1, BTG1, BTK, BTLA, CARD11, CASP5, CASP8, CBFB, CBL, CCDC150, CCDC168, CCDC43, CCL2, CCL4, CCND1, CCND2, CCND3, CCNE1, CD27, CD274, CD276, CD28, CD30, CD35, CD36, CD4, CD40, CD44, CD79A, CD79B, CD8A, CDC42, CDC73, CDH1, CDH2, CDH20, CDH5, CDK12, CDK4, CDK6, CDK8, CDKN1A, CDKN1B, CDKN2A, CDKN2B, CDKN2C, CDK2, CEBPA, CHD1, CHD2, CHD4, CHEK1, CHEK2, CHUK, CIC, CRBN, CREBBP, CRKL, CRLF2, CSF1R, CSF2, CSF2RA, CSF2RB, CSNK2A1, CTCF, CTLA4, CTNNA1, CTNNB1, CUL3, CUL4A, CUL4B, CXCL10, CXCL11, CXCL9, CXCR3, CYLD, CYP17A1, DAXX, DCUN1D1, DDR2, DICER1, DIS3, DNMT1, DNMT3A, DOCK2, DOT1L, EGFR, ELMO1, EML4, EMSY, EP300, EPHAS, EPHAS, EPHAG, EPH47, EPHB1, EPHB4, EPHB6, ERBB2, ERBB3, ERBB4, ERCC1, ERCC2, ERG, ERRF1, ESR1, ETV1, ETV4, ETV5, ETV6, EWSR1, EYA2, EZH2, FAM46C, FANCA, FANCC, FANCD2, FANCE, FANCE, FANCE, FANC1, FANCL, FANCM, FA5, FAT1, FAT3, FBXW7, FGF1, FGF10, FGF1, FGF14, FGF19, FGF2, FGF23, FGF3, FGF4, FGF6, FGF7, FGFR1, FGFR2, FGFR3, FGFR4, FH, FLCN, FLT1, FLT3, FLT4, FOXA1, FOXA2, FOXO3, FOXP1, FOXP3, FRS2, FUBP1, GABRAG, GAS6, GATA1, GATA2, GATA3, GATA4, GATA6, GID4, GLI1, GNA11, GNA13, GNAQ, GNA5, GRIN2A, GRM3, GSK38, GI/CY1A2, GZMA, GZMB, GZMH, H3F3A, HGF, HIST1H3B, HLA-A, HLA-B, HLA-C, HLA-DRA, HLA-E, HLA-F, HLA-F, HLA-G, HNF1A, HOXA3, HRAS, HSDB1, HSP90AA1, IDH1, IGH1, IDH2, IDO1, IDO2, IFITM1, IFITM3, IFNA1, IFNB1, IFNG, IGF1, IGF1R, IGF2, IGF2R, IKBKE, IKZF1, IL12A, IL12B, IL2, IL23A, IL6, IL7R, INHBA, INPP4B, INSR, IRF2, IRF4, IRF2, ITGAE, ITK, JAK1, JAK2, JAK3, JUN, KAT6A, KOM5A, KOM5C, KOM6A, KDR, KEAP1, KEL, KIT, KLF4, KLH16, KMT2A, KMT2B, KMT2C, KNSTRN, KRAS, LAG3, LM01, LRP1B, LRP6, LTK, LYN, LZTR1, MAGI2, MAGOH, MAML1, MAP2K1, MAP2K2, MAP2K4, MAP3K1, MAP3K13, MAPK1, MAX, MC1, MDM2, MDM4, MED1, MEF2B, MEN1, MET, MITF, MLH1, MP1, MRE11, MSH2, MSH6, MTOR, MUTTH, MYB, MYC, MYC1, MYCN, MYD88, MYO18A, NCOA3, NCOR1, NF1, NF2, NF2L2, NFKB1A, NKX2-1, NKX2-8, NKX3-1, NOTCH1, NOTCH2, NOTCH3, NOTCH4, NPM1, NRAS, NSD1, NSD3, NTRIX1, NTRIX2, NTRIX3, NUP93, NUTM1, PAK3, PAK5, PALB2, PARX2, PARP1, PARP2, PARP3, PARP4, PAX5, PBRM1, PDCD1, PDCD1LG2, PDGFRA, PDGFRB, PDK1, PGR, PHF6, PHLP2, PRM1, PIK3C2B, PIK3C3, PIK3CA, PIK3CB, PIK3CG, PIK3R1, PIK3R2, PKHD1, PLCG1, PLCG2, PMS2, PNP, PNRC1, POLD1, POLE, PPARG, PPP2R1A, PRDM1, PREX2, PRE1, PRKAR1A, PRKC1, PRKDC, PRPF40B, PRSS8, PTCH1, PTCH2, PTEN, PTK2, PTPN11, PTPRC, PTPRD, QKI, RAB35, RAC1, RAC2, RAD17, RAD50, RAD51, RAD51B, RAD51C, RAD51D, RAD52, RAD54L, RAF1, RANBP2, RARA, RB1, RBMI0, REL, RET, RHEB, RHOA, RHOB, RICTOR, RNFA3, ROB01, ROB02, ROS1, RP41, RPS6KB1, RPTor, RUNX1, RUNX1T1, RUNX3, SDHA, SDHB, SDHC, SDHD, SEMA3A, SEMA3E, SET, SETBP1, SETD2, SF3A1, SF3B1, SH2B3, SKP2, SLIT2, SMAD2, SMAD3, SMADA1, SMARC4, SMARC4, SMARCB1, SMARCD1, SMO, SNCAP, SOS1, SOX10, SOX2, SOX9, SPEN, SPOP, SPTA1, SRC, SRSF1, SRSF2, SRSF7, STAG2, STAT3, STAT4, STK11, SUFU, SYK, TACC3, TAF1, TBX22, TBX3, TERC, TERT, TET1, TET2, TGFBR2, TIAF1, TIGIT, TIPARP, TIMPRS2, TNF, TNFAP3, TNFSF14, TNFSF18, TNFSF4, TNFSF13B, TNKS, TNKS2, TOP1, TOP2A, TP53, TRAF7, TRRap, TSC1, TSC2, TSHR, U2AF1, U2AF2, USP9X, VEGFA, VHL, VSR, VTCN1, WISP3, WNT1, WT1, WWP1, XBP1, XP01, XRC3, ZBTB2, ZNF217, ZNF703, ZRSR2')">Список генов</button>
+                </div>
+                <div class="feature">
+                    <h3>CancerScreen Panel - Comprehensive</h3>
+                    <p>706 генов (697 генов для DNA, 68 генов для RNA), 2.32 Mb (DNA), 201 Kb (RNA). CDS, Hotspot variant, UTR, Intronic, Intergenic regions, and MSI markers.</p>
+                    <button onclick="showGenes('ABL1, ABL2, ABRAXAS1, ACVR1, ACVR1B, ACVR2A, ADAM29, ADGRA2, ADTRP, AKT1, AKT2, AKT3, ALK, ALOX12B, ALOX15B, AMER1, ANKRD11, ANKRD26, APC, APCDD1, APEX1, APOB, APOBEC1, APOBEC3A, APOBEC3B, AR, ARAF, ARFRP1, ARID1A, ARID1B, ARID2, ARID5B, ASTE1, ASXL1, ASXL2, ATM, ATP11B, ATR, ATRX, AURKA, AURKB, AXIN1, AXIN2, AXL, B2M, B3GAT1, BACH1, BAP1, BARD1, BAX, BBC3, BCL10, BCL2, BCL2A1, BCL2L1, BCL2L11, BCL2L2, BCL6, BCL9, BCOR, BCORL1, BCR, BEX5, BIRC2, BIRC3, BLM, BMPR1A, BRAF, BRCA1, BRCA2, BRD2, BRD3, BRD4, BRIP1, BTG1, BTK, BTLA, CADM1, CALR, CARD11, CASP5, CASP8, CBFB, CBL, CCDC150, CCDC168, CCDC43, CCL2, CCL4, CCN6, CCND1, CCND2, CCND3, CCNE1, CD27, CD274, CD276, CD28, CD3D, CD3E, CD3G, CD4, CD40, CD44, CD74, CD79A, CD79B, CD8A, CDC42, CDC73, CDH1, CDH2, CDH20, CDH5, CDK12, CDK4, CDK6, DK8, CDKN1A, CDKN1B, CDKN2A, CDKN2B, CDKN2C, CDX2, CEBPA, CENPA, CHD1, CHD2, CHD4, CHEK1, CHEK2, CHUK, CIC, COLEC12, COP1, CRBN, CREBBP, CRK, CRKL, CRLF2, CSF1R, CSF2, CSF2RA, CSF2RB, CSF3R, CSNK1A1, CSNK2A1, CTCF, CTLA4, CTNNA1, CTNNB1, CUL3, CUL4A, CUL4B, CUX1, CXCL10, CXCL11, CXCL9, CXCR3, CXCR4, CYLD, CYP17A1, CYP4Z2P, DAXX, DCUN1D1, DDHD1, DDR2, DDX41, DEFB105A, DHX15, DICER1, DIS3, DNAJB1, DNMT1, DNMT3A, DNMT3B, DOCK2, DOCK3, DOT1L, E2F3, EED, EGFL7, EGFR, EIF1AX, EIF4A2, EIF4E, ELMO1, ELOC, EML4, EMP1, EMSY, EP300, EPCAM, EPHA3, EPHA5, EPHA6, EPHA7, EPHB1, EPHB4, EPHB6, ERBB2, ERBB3, ERBB4, ERCC1, ERCC2, ERCC3, ERCC4, ERCC5, ERG, ERRFI1, ESR1, ETS1, ETV1, ETV4, ETV5, ETV6, EWSR1, EYA2, EZH2, FANCA, FANCC, FANCD2, FANCE, FANCF, FANCG, FANCI, FANCL, FANCM, FAS, FAT1, FAT3, FBXW7, FGF1, FGF10, FGF12, FGF14, FGF19, FGF2, FGF23, FGF3, FGF4, FGF5, FGF6, FGF7, FGF8, FGF9, FGFR1, FGFR2, FGFR3, FGFR4, FH, FLCN, FLI1, FLT1, FLT3, FLT4, FOXA1, FOXL2, FOXO1, FOXO3, FOXP1, FOXP3, FRS2, FUBP1, FYN, GABRA6, GAS6, GATA1, GATA2, GATA3, GATA4, GATA6, GEN1, GID4, GLI1, GNA11, GNA13, GNAQ, GNAS, GPS2, GREM1, GRIN2A, GRM3, GSK3B, GUCY1A2, GZMA, GZMB, GZMH, H1-2, H2AC13, H2BC5, H3-3A, H3-3B, H3-4, H3-5, H3C1, H3C11, H3C12, H3C13, H3C14, H3C15, H3C2, H3C3, H3C4, H3C6, H3C7, H3C8, HGF, HLA-A, HLA-B, HLA-C, HLA-DRA, HLA-E, HLA-F, HLA-G, HNF1A, HNRNPK, HOXA3, HOXB13, HRAS, HSD3B1, HSP90AA1, ICOSLG, ID3, IDH1, IDH2, IDO1, IDO2, IFITM1, IFITM3, IFNA1, IFNB1, IFNG, IFNGR1, IGF1, IGF1R, IGF2, IGF2R, IKBKE, IKZF1, IL10, IL12A, IL12B, IL2, IL23A, IL6, IL7R, INHA, INHBA, INPP4A, INPP4B, INSR, IRF2, IRF4, IRS1, IRS2, ITGAE, ITK, JAK1, JAK2, JAK3, JUN, KAT6A, KDM5A, KDM5C, KDM6A, KDR, KEAP1, KEL, KIF5B, KIT, KLF4, KLHL6, KMT2A, KMT2B, KMT2C, KMT2D, KNSTRN, KRAS, LAG3, LAMP1, LATS1, LATS2, LMO1, LRP1B, LRP6, LTK, LTN1, LYN, LZTR1, MAGI2, MAGOH, MALT1, MAML1, MAP2K1, MAP2K2, MAP2K4, MAP3K1, MAP3K13, MAP3K14, MAP3K4, MAPK1, MAPK3, MAX, MCL1, MDC1, MDM2, MDM4, MED12, MEF2B, MEF2C, MEN1, MET, MGA, MITF, MLH1, MLLT3, MPL, MRE11, MSH2, MSH3, MSH6, MST1, MST1R, MTMR11, MTOR, MTR, MUTYH, MYB, MYC, MYCL, MYCN, MYD88, MYL1, MYLK, MYO18A, MYOD1, NAB2, NBN, NCOA3, NCOR1, NDUFC2, NEGR1, NF1, NF2, NFE2L2, NFKBIA, NKX2-1, NKX2-8, NKX3-1, NOMO1, NOTCH1, NOTCH2, NOTCH3, NOTCH4, NPM1, NRAS, NRG1, NSD1, NSD3, NTRK1, NTRK2, NTRK3, NUP93, NUTM1, PAK1, PAK3, PAK5, PALB2, PARP1, PARP2, PARP3, PARP4, PAX3, PAX5, PAX7, PAX8, PBRM1, PCDH17, PDCD1, PDCD1LG2, PDE4D, PDGFRA, PDGFRB, PDK1, PDPK1, PGR, PHF6, PHLPP2, PHOX2B, PIK3C2B, PIK3C2G, PIK3C3, PIK3CA, PIK3CB, PIK3CD, PIK3CG, PIK3R1, PIK3R2, PIK3R3, PIM1, PKHD1, PLCG1, PLCG2, PLK2, PMAIP1, PMS1, PMS2, PNP, PNRC1, POLD1, POLE, PPARG, PPM1D, PPP2R1A, PPP2R2A, PPP6C, PRDM1, PREX2, PRF1, PRKAR1A, PRKCI, PRKDC, PRKN, PRPF40B, PRSS8, PTCH1, PTCH2, PTEN, PTK2, PTPN11, PTPRC, PTPRD, PTPRS, PTPRT, PUS3, QKI, RAB35, RAC1, RAC2, RAD17, RAD21, RAD50, RAD51, RAD51B, RAD51C, RAD51D, RAD52, RAD54L, RAF1, RANBP2, RARA, RASA1, RB1, RBM10, RBMXL1, RECQL4, REL, RET, RFX1, RHEB, RHOA, RHOB, RICTOR, RIT1, RNF19B, RNF43, ROBO1, ROBO2, ROS1, RPA1, RPS6KA4, RPS6KB1, RPS6KB2, RPTor, RUNX1, RUNX1T1, RUNX3, RYBP, SDHA, SDHAF2, SDHB, SDHC, SDHD, SEC31A, SEMA3A, SEMA3E, SET, SETBP1, SETD2, SF3A1, SF3B1, SH2B3, SH2D1A, SHQ1, SKP2, SLC22A9, SLIT2, SLITRK3, SLX4, SMAD2, SMAD3, SMAD4, SMAP1, SMARCA1, SMARCA4, SMARCB1, SMARCD1, SMC1A, SMC3, SRSF2, STAG1, STAG2, STAT3, STAT4, STAT5A, STAT5B, STC1, STK11, STK40, SUFU, SUZ12, SYK, TACC3, TAF1, TBX22, TBX3, TCF3, TCF7L2, TENT5C, TERC, TERT, TET1, TET2, TFE3, TFRC, TGFBR1, TGFBR2, TIAF1, TIGIT, TIPARP, TMEM127, TMPRSS2, TNF, TNFAIP3, TNFRSF14, TNFRSF18, TNFRSF4, TNFSF13B, TNKS, TNKS2, TOP1, TOP2A, TP53, TP63, TRAF2, TRAF7, TRRap, TSC1, TSC2, TSHR, U2AF1, U2AF2, USP9X, VEGFA, VHL, VSIR, VTCN1, WNT1, WT1, WWP1, XBP1, XIAP, XPO1, XRCC2, XRCC3, YAP1, YES1, ZBTB2, ZBTB7A, ZFHX3, ZNF217, ZNF703, ZRSR2')">Список генов</button>
+                </div>
+            </div>
+        </section>
+        <section id="hereditary" class="section">
+            <h2>Наследственные заболевания</h2>
+            <div class="features">
+                <div class="feature">
+                    <h3>Болезнь Альцгеймера-Паркинсона</h3>
+                    <p>77 генов, 244.8 Kb. Болезнь Альцгеймера, болезнь Паркинсона, деменция, дистония.</p>
+                    <button onclick="showGenes('ABCA7, ADCY5, ALS2, ANG, ANO3, APP, ATP13A2, ATP1A3, ATP7B, C19orf12, CACNA1B, CHCHD10, CHMP2B, CHRNA4, CIZ1, COL6A3, DAO, DCTN1, FIG4, FUS, GBA, GCH1, GNAL, GNAO1, GRN, HNRNPA1, HNRNPA2B1, HPCA, KCTD17, KMT2B, LRRK2, MAPT, MATR3, MECR, NEK1, OPTN, PANK2, PARK7, PINK1, PLA266, PNKD, PRKN, PRKRA, PRNP, PRRT2, PSEN1, PSEN2, RELN, SETX, SGCE, SIGMAR1, SLC19A3, SLC2A1, SLC30A10, SLC6A3, SNCA, SOD1, SORL1, SPG11, SOSTM1, SRY, TAF1, TAF15, TARDBP, TBK1, TH, THAP1, TIMM8A, TOR1A, TREM2, TUBAAA, TUBB4A, UBQLN2, VAC14, VAPB, VCP, VPS13A')">Список генов</button>
+                </div>
+                <div class="feature">
+                    <h3>Нарушения свертываемости крови</h3>
+                    <p>115 генов, 326.3 Kb. Нарушение свертываемости крови.</p>
+                    <button onclick="showGenes('ABCA1, ACTN1, ANKRD26, ANO6, AP3B1, BLOC153, BLOC156, BRCA1, BRCA2, BRIP1, CD36, CDAN1, CYCS, DDX41, DKC1, DTNBP1, ELANE, ERCC4, ETV6, F10, F11, F13A1, F13B, F2, F5, F7, F8, F9, FANCA, FANCB, FANCC, FANCD2, FANCE, FANCE, FANCE, FANC1, FANCL, FANCM, FERMT2, FGA, FGB, FGG, FLI1, FYB1, GATA1, GATA2, GFI1, GFIIB, GP1BA, GP1BB, GP6, GP9, HAX1, HOXA11, HPS1, HPS3, HPS4, HPS5, HPS6, IFNG, ITGA2B, ITGB3, LMAN1, LYST, MASTL, MCFD2, MLPH1, MPL, MYH9, MYOSA, NBEAL2, NBN, NHP2, NOP10, P2RY12, PALB2, PLAZG4A, PLAU, PRF1, PRKACG, RAB27A, RAD51C, RASGRP2, RBMBA, RPL11, RPL35A, RPL5, RPS10, RPS19, RPS24, RPS26, RPS7, RUNX1, SBDS, SEC23B, SERPINE1, SERPINF2, SLFN14, SLX4, SRC, SRP72, SRY, STIM1, TBXA2R, TBXAS1, TERC, TERT, TINF2')">Список генов</button>
+                </div>
+                <div class="feature">
+                    <h3>Сердечно-сосудистые заболевания</h3>
+                    <p>174 гена, 681.3 Kb. Сердечно-сосудистые заболевания.</p>
+                    <button onclick="showGenes('ABCC9, ABCG5, ABCG8, ACTA1, ACTA2, ACTC1, ACTN2, AKAP9, ALMS1, ANK2, ANKRD1, APOA4, APOA5, APOB, APOC2, APOE, BAG3, BRAF, CACNA1C, CACNA2D1, CACNB2, CALM1, CALR3, CASQ2, CAV3, CBL, CBS, CETP, COL3A1, COL5A1, COL5A2, COX15, CREB313, CRELD1, CRYAB, CSRP3, CTF1, DES, DMD, DNAJC19, DOLK, DP96, DSC2, DSG2, DSP, DTNA, EFEMP2, ELN, EMD, EVA4, FBN1, FBN2, FHL1, FHL2, FKRP, FKTN, FXN, GAA, GATAD1, GCKR, GJAS, GLA, GPD11, GPHBP1, HADHA, HCM4, HFE, HRAS, HSPB8, ILK, JAG1, JPH2, JUP, KCNA5, KCND3, KCNE1, KCNE2, KCNE3, KCNH2, KCNJ2, KCNJ5, KCNJ8, KCNQ1, KUF10, KRAS, LAMA2, LAMA4, LAMP2, LDB3, LDLR, LDLRAP1, LMF1, LMNA, LPL, LTBP2, MAP2K1, MAP2K2, MIB1, MURC, MYBPC3, MYH11, MYH6, MYH7, MYL2, MYL3, MYLK, MYLK2, MYO6, MYQZ2, MYPN, NEXN, NKX2-5, NODAL, NOTCH1, NPPA, NRAS, PCSK9, PDLIM3, PKP2, PLN, PRDM16, PRKAG2, PRKAR1A, PTPN11, RAF1, RANGRF, RBM20, RYR1, RYR2, SALL4, SCH1B, SCH2B, SCH3B, SCH4B, SCHSA, SCQ2, SDHA, SEPN1, SGCB, SGCD, SGGC6, SHOC2, SLC25A4, SLC24A0, SMAD3, SMADA4, SNTA1, SOS1, SREBF2, TAZ, TBX20, TBX3, TBX5, TCAP, TGFB2, TGFB3, TGFBR1, TGFBR2, TMEMA43, TMPO, TNNC1, TNN13, TNNT2, TPM1, TRDN, TRIM63, TRPM4, TTN, TTR, TXNRD2, VCL, ZBTB17, ZHX3, ZIC3')">Список генов</button>
+                </div>
+                <div class="feature">
+                    <h3>РАСопатии</h3>
+                    <p>14 генов, 37.5 Kb. РАСопатии.</p>
+                    <button onclick="showGenes('BRAF, CBL, HRAS, KRAS, MAP2K1, MAP2K2, NF1, NRAS, PTPN11, RAF1, RIT1, SHOC2, SOS1, SPRED1')">Список генов</button>
+                </div>
+                <div class="feature">
+                    <h3>Наследственный рак</h3>
+                    <p>61 ген, 218 Kb. Наследственный рак.</p>
+                    <button onclick="showGenes('APC, ATM, ATRX, BARD1, BMPR1A, BRAF, BRCA1, BRCA2, BRIP1, CDH1, CDKN2A, CHEK2, EGUN1, EGUN2, EPA51, EPCAM, FGFR1, FH, H3F3A, HRAS, IDH2, KIF1B, KM72D, MAX, MDH2, MEN1, MERTK, MET, MLH1, MRE11, MSH2, MSH6, MUTYH, NBN, NF1, NF2, PALB2, PMS2, POLD1, POLE, PRSS1, PTEN, RAD50, RAD51C, RAD51D, RB1, RET, SDHA, SDHAF2, SDHB, SDHC, SDHD, SMADA, SPINK1, STK11, TMEM127, TP53, TSC1, TSC2, VHL, WT1')">Список генов</button>
+                </div>
+                <div class="feature">
+                    <h3>Эпилепсия</h3>
+                    <p>119 генов, 401.6 Kb. Эпилепсия.</p>
+                    <button onclick="showGenes('AARS, ADGRV1, ADSL, ALDH7A1, ALG13, ARHGEF15, ARHGEF9, ARX, ASAH1, ATP1A2, ATP6AP2, CACNA1A, CASK, CDKL5, CHD2, CHRNA2, CHRNA4, CHRNA7, CHRNB2, CLCM4, CLN3, CLN5, CLN6, CLN8, CNTNAP2, CSTB, CTSD, DCX, DEPDC5, DLG3, DNAJC5, DNM1, DOCK7, DYRK1A, EEF1A2, EPM2A, FOLR1, FOXG1, GABRA1, GABRA2, GABRB3, GABRG2, GAMT, GATM, GNAO1, GOSR2, GRIN1, GRIN2A, GRIN2B, HCN1, HDAC4, HNRNPU, IQSEC2, KANS1L, KCNA2, KCNB1, KCNH5, KCNI10, KCNMA1, KCNQ2, KCNQ3, KCNT1, KCTD7, LG11, MAGI2, MBD5, MECP2, MEF2C, MF5D8, NECAP1, NHLRC1, NR2F1, NRXN1, PCDH19, PIGA, PIGO, PIGQ, PIGV, PLCB1, PNKP, PNPO, POLG, PPT1, PRICKLE1, PRICKLE2, PRRT2, QARS, RELN, SCARB2, SCN1A, SCN1B, SCN2A, SCN8A, SCN9A, SLC13A5, SLC25A22, SLC2A1, SLC35A2, SLC6A8, SLC9A6, SM5, SPTAN1, SRPX2, SRY, ST3GA13, STXBP1, SYN1, SYNGAP1, SYN1L, SZT2, TBC1D24, TCF4, TPP1, TSC1, TSC2, UBE3A, WDR45, WWOX, ZEB2')">Список генов</button>
+                </div>
+                <div class="feature">
+                    <h3>Потеря слуха</h3>
+                    <p>30 генов, 130.3 Kb. Потеря слуха, Глухота.</p>
+                    <button onclick="showGenes('CDH23, CLRN1, COCH, COLL1A1, COL2A1, DIAPH1, EDNRB, EYA1, GJB2, GJB6, KCNE1, KCNQ1, KCNQ4, MITF, MYO15A, MYO7A, OTOF, PAX3, POU3F4, SIX5, SLC26A4, SNAI2, SOX10, TECTA, TMC1, TMIE, TMPRSS3, USH1C, USH2A, WFS1')">Список генов</button>
+                </div>
+                <div class="feature">
+                    <h3>Лимфоидный лейкоз</h3>
+                    <p>62 гена, 139.9 Kb. Лимфоидный лейкоз.</p>
+                    <button onclick="showGenes('ABL1, AMELX, AMELY, ARHGAP35, BRAF, BTG1, CDKN2A, COL4A4, CPNE1, CREBBP, CRIF2, DNM2, DNMT3A, EP300, ETV6, EZH2, FBXW7, FLT3, GATA3, IDH1, IDH2, IKZF1, IL7R, JAK1, JAK2, JAK3, KDM6A, KIAA1244, KMT2A, KMT2D, KRAS, LEF1, LMQ1, MAPK1, NF1, NOTCH1, NRAS, NSD2, NTSC2, NUDT15, PAX5, PCNK1, PHF6, PRUNE2, PTEN, PTPN11, RB1, RIPK3, RUNX1, SETD2, SH2B3, SP4, SRY, STAG2, STAT3, STAT5B, TBLLXR1, TCF3, TP53, TPMT, USPGNL, WT1')">Список генов</button>
+                </div>
+                <div class="feature">
+                    <h3>Лимфома</h3>
+                    <p>51 ген, 118.3 Kb. Лимфома.</p>
+                    <button onclick="showGenes('ALK, ATM, B2M, BCL6, BIRC3, BRAF, BTK, CARD11, CD79A, CD79B, CREBBP, CXCR4, EGR2, EP300, EZH2, FAS, FAT4, FBXQ11, ID3, IDH2, IKBKB, IKZF1, JAK3, KLF2, MYC, MYD88, NFKBIE, NOTCH1, NOTCH2, PLCG1, PLCG2, POT1, PRDM1, RHOA, RPS15, RRAGC, SF3B1, SOCS1, SRY, STAT3, STAT5B, TBLLXR1, TCF3, TET2, TNFAlP3, TNFRSF14, TP53, TP63, TRAF3, UBR5, XPO1')">Список генов</button>
+                </div>
+                <div class="feature">
+                    <h3>Лизосомальные болезни накопления</h3>
+                    <p>86 генов, 195.9 Kb. Лизосомальные болезни накопления.</p>
+                    <button onclick="showGenes('ABCD1, ACOX1, AGA, AGL, ALDOA, ALDOB, ARSA, ARSB, ATP13A2, ATP7A, ATP7B, CLN3, CLN5, CLN6, CLN8, CTN5, CTSA, CTSD, CTSF, DNAJC5, FUCA1, G6PC, GAA, GALC, GALE, GALK1, GALK2, GALN5, GALT, GBA, GBE1, GJB2, GLA, GLB1, GNP7AB, GNPTG, GNS, GRN, GUSB, GYS1, GYS2, HEXA, HEXB, HGSMAT, HPRT1, HYAL1, IDS, IDUA, KCTD7, LDHA, LIPA, MAN2B1, MANBA, MCOLN1, MFSDB, NAGA, NAGLU, NEU1, NPC1, NPC2, PEX1, PEX10, PEX12, PEX13, PEX14, PEX16, PEX19, PEX2, PEX26, PEX3, PEX5, PEX6, PFKM, PHKA2, PHKB, PHKG2, PPT1, PYGL, PYGM, SGSH, SLC17A5, SLC2A2, SLC37A4, SMPD1, SUMF1, TPP1')">Список генов</button>
+                </div>
+                <div class="feature">
+                    <h3>Метаболические нарушения</h3>
+                    <p>71 ген, 138.3 Kb. Врожденные нарушения обмена веществ.</p>
+                    <button onclick="showGenes('ABCD1, ACAD8, ACADM, ACADS, ACADSB, ACADVL, ACAT1, AHCY, ARG1, ASL, ASS1, AUH, BCKDHA, BCKDHB, BTD, CBS, CPS1, CPT1A, CPT2, DBT, DECR1, DHCR7, DLD, ETFA, ETFB, ETFDH, FAH, GALE, GALK1, GALT, GAMT, GATM, GCDH, GCH1, GNMT, HADH, HADHA, HADHB, HLC5, HMGCL, HPD, HSD17B10, IVD, LMBRD1, MAT1A, MCCC1, MCCC2, MLYC0, MMAA, MMAB, MMACHC, MMADHC, MMUT, MTHFR, MTR, MTRR, OPA3, OTC, PAH, PCBD1, PCCA, PCCB, PT5, QDPR, SLC22A5, SLC25A13, SLC25A20, SLC6A8, TAT, TAZ, TCN2')">Список генов</button>
+                </div>
+                <div class="feature">
+                    <h3>Миелоидный лейкоз</h3>
+                    <p>49 генов, 94.8 Kb. Миелоидный лейкоз.</p>
+                    <button onclick="showGenes('ANKRD26, ASXL1, ATRX, BCOR, BCORL1, BRAF, CALR, CBL, CBLB, CEBPA, CSF3R, DDX41, DNMT3A, ETV6, EZH2, FLT3, GATA1, GATA2, HRAS, IDH1, IDH2, JAK2, JAK3, KDM6A, KIT, KRAS, MPL, NOTCH1, NPM1, NRAS, PDGFRA, PHF6, PPM1D, PTPN11, RAD21, RUNX1, SETBP1, SF3B1, SMCLA, SMC3, SRSF2, STAG1, STAG2, STAT3, TET2, TP53, U2AF1, WT1, ZRSR2')">Список генов</button>
+                </div>
+                <div class="feature">
+                    <h3>Пигментный ретинит</h3>
+                    <p>111 генов, 325.3 Kb. Пигментный ретинит.</p>
+                    <button onclick="showGenes('ABCA4, ABHD12, ADAM9, ADGRA3, AGBL5, AIPL1, ARHGEF18, ARL2BP, ARL3, ARL6, BBS1, BBS2, BEST1, C20rf71, C80rf37, CA4, CABP4, CACNA1F, CACNA2D4, CDHR1, CERKL, CLRN1, CNGA1, CNGB1, CNGB3, CNNM4, CRB1, CRX, CWC27, CYP4V2, DHDDS, DHX38, ELOVL4, EMC1, EYS, FAM161A, FLVCR1, FSCN2, GNAT2, GUCA1A, GUCA1B, GUCY2D, HGSNAT, HK1, IDH3B, IFT140, IFT172, IMPDH1, IMPG2, KCNV2, KIAA1549, KIZ, KLHL7, LRAT, MAK, MERTK, MVK, NEK2, NEUROD1, NR2E3, NRL, OFD1, PDE6A, PDEGB, PDE6C, PDE6G, PDE6H, PTPNNA3, POMGNT1, PRCD, PRKCG, PROM1, PRPF3, PRPF31, PRPF4, PRPF6, PRPF8, PRPH2, RAB28, RAX2, RBP3, RDH12, RDH5, REEP6, RGR, RGS9, RGS9BP, RHO, RIMS1, RLBP1, ROM1, RP1, RP2, RP9, RPE65, RPGR, RPGRIP1, SAG, SEMAAA, SLC7A14, SNRNP200, SPATA7, SPP2, TOPORS, TRNT1, TTC8, TULP1, UNC119, USH2A, ZNF408, ZNF513')">Список генов</button>
+                </div>
+                <div class="feature">
+                    <h3>Солидные опухоли</h3>
+                    <p>60 генов, 109.4 Kb. Солидные опухоли.</p>
+                    <button onclick="showGenes('ABL1, AKT1, ALK, APC, ATM, BRAF, BRCA1, BRCA2, CDH1, CDKN2A, CSF1R, CTNNB1, DLC1, EGFR, ERBB2, ERBB4, ESR1, FBXW7, FGFR1, FGFR2, FGFR3, FTSI3, GNA11, GNAQ, GNAS, HNF1A, HRAS, IDH1, IDH2, ITPRID2, JAK2, JAK3, KCNB2, KDR, KIT, KRAS, MET, MLH1, MYC, MYCN, NOTCH1, NRAS, NRXN1, PDGFRA, PHX3CA, PTEN, PTPN11, RB1, RBAK, RET, ROS1, SMADA4, SMARCB1, SMO')">Список генов</button>
+                </div>
+                <div class="feature">
+                    <h3>Нервно-мышечные заболевания</h3>
+                    <p>291 ген, 1,160 Kb. Нервно-мышечные заболевания.</p>
+                    <button onclick="showGenes('AARS, ABCB7, ABCD1, ABHD12, ACAD9, ACADL, ACADM, ACO2, ACTA1, ADCK3, AFG3L2, AGL, AIFM1, ALDH3A2, AMPD1, ANO10, ANO5, AP481, AP4E1, AP4M1, AP4S1, APSZ1, APTX, ARSA, ATCAY, ATL1, ATM, ATP2A1, ATP7A, ATP7B, ATP8A2, BAG3, BEAN1, BIN1, BSCL2, C10orf2, C12orf65, C19orf12, CACNA1A, CACNA1S, CACNB4, CAPN3, CASK, CAV3, CCDC78, CCDC88C, CFL2, CHAT, CHRNA1, CHRNB1, CHRND, CHRNE, CHRNG, CLCN1, CLCN2, CLN5, CNTN1, COL6A1, COL6A2, COL6A3, COLO, CPT1B, CPT2, CRYAB, CTDP1, CWF19L1, CYP27A1, CYP21L1, CYP781, DAG1, DCTN1, DDHD1, DDHD2, DES, DMD, DNAJB2, DNAJB6, DNM2, DNMT1, DOK7, DYNCHH1, DYSF, EEF2, EGR2, ELOV14, ELOV15, EMD, ERLIN2, ETFA, ETFB, FA2H, FAM134B, FGD4, FGF14, FHL1, FIG4, FKRP, FKTN, FLNC, FLVCR1, FRMD7, FUS, FXN, GAA, GAD1, GALC, GAN, GARS, GBA2, GDAP1, GJB1, GJC2, GLA, GLE1, GNB4, GNE, GOSR2, GPR143, GRID2, GRM1, GYS1, HADHA, HADHB, HINT1, HOXD10, HSP81, HSPB8, HSPD1, HSPG2, IGHMBP2, IKBKAP, ISPD, ITGA7, ITPR1, JPH3, KBTBD13, KCMA1, KCNC3, KCND3, KCNE3, KCNI10, KCNI18, KIAA0196, KIF1A, KIF1B, KIF1C, KIF5A, KLH140, KLH141, L1CAM, LAMA1, LAMA2, LARGE, LD83, LITAF, LMMA, LPIN1, LRSAM1, MARS, MARS2, MATR3, MED25, MFN2, MPZ, MRE11A, MTM1, MTMR14, MTMR2, MTPAP, MTTP, MUSK, MYF6, MYOT, NDRG1, NEB, NEFL, NGF, NIPA1, NOP56, NTRK1, OPA1, OPA3, OPHN1, PABPN1, PANK2, PDK3, PDYN, PEX7, PFKM, PGAM2, PHKA1, PHYH, PLEC, PLEKHGS, PLP1, PMM2, PMP22, PNKP, PNP1A6, POLG, POLG2, POMGNT1, POMT1, POMT2, PRKGG, PRPS1, PRX, PTF1A, PTRF, PYGM, RAB7A, RAPSN, REEP1, RNF216, RRM2B, RTN2, RUBCN, RVR1, RVR2, SACS, SBF2, SCNAA, SCN9A, SEPN1, SETX, SGCA, SGCB, SGCD, SGCE, SGCG, SH3TC2, SIL1, SLC12A6, SLC16A2, SLC1A3, SLC33A1, SLC39A4, SLC52A2, SLC9A1, SLC9A6, SMN1, SNX14, SOD1, SPAST, SPG11, SPG20, SPG21, SPG7, SPTBN2, SPTLC1, SPTLC2, STAC3, STUB1, SUCLA2, SYNE1, SYNE2, SYT14, TBP, TCAP, TDP1, TECPR2, TGM6, TX2, TMEM240, TNN1, TNNT1, TPM2, TPM3, TPP1, TRIM32, TRPV4, TTBK2, TTN, TTPA, TTR, TUB84A, TYMP, VAMP1, VCP, VLDLR, VP513A, VP537A, VRK1, WFS1, WNK1, WWOX, XK, YARS, ZFYVE26, ZFYVE27, ZNF592')">Список генов</button>
+                </div>
+                <div class="feature">
+                    <h3>Задержка роста</h3>
+                    <p>162 гена, 616.1 Kb. Задержка роста.</p>
+                    <button onclick="showGenes('ACTA2, ADAMTS10, ADAMTS2, ADAMTS14, AGPS, ALPL, ARSE, ATP6V0A2, ATP7A, ATRX, B3GALT6, B4GALT7, BGN, BLM, BRAF, CBL, CBS, CDC6, CDT1, CHST14, COL10A1, COL11A1, COL1A1, COL1A2, COL2A1, COL3A1, COL5A1, COL5A2, COL9A1, COL9A2, COL9A3, COMP, CREBBP, CRTAP, CTSK, CUL7, DHCR7, DL13, DYNC2H1, DYRK1A, EBP, EFEMP2, ELN, EP300, ERCC6, ERCC8, EVC, EVC2, EXT1, EXT2, FBLNS, FBN1, FBN2, FGD1, FGF23, FGFR1, FGFR2, FGFR3, FRBP10, FLNA, FLNB, FOXE3, GH1, GHR, GHRHR, GL12, GL13, GMAS, GNPAT, HESX1, HRAS, HSPG2, IFTIM5, IFT80, IGF1, IGF1R, INPPL1, KCNJ2, KCNJ8, KDM6A, KMT2D, KRAS, LBR, LHX3, LIFR, LOX, LTBP2, LZTR1, MAP2K1, MAP2X2, MAT2A, MATN3, MED12, MFAP5, MYH11, MYLK, NBAS, NBN, NEK1, NF1, NIPBL, NRAS, NSDHL, OBSL1, ORC1, ORC4, ORC6, P3H1, PCNT, PEX7, PHEX, PLOD1, POR, POULF1, PPIB, PPP1CB, PRKG1, PROP1, PTPN11, PYCR1, RAF1, RIN2, RIT1, RMRP, ROR2, RP56KA3, RUNX2, SBD5, SERPINH1, SHOC2, SKI, SLC26A2, SLC24A0, SLC34A3, SLC35D1, SLC39A13, SMAD3, SMARCAL1, SMCLA, SMC3, SMS, SOS1, SOS2, SOX3, SOX9, SPRED1, SRCAP, SRY, TGFB1, TGFB2, TGFB3, TGFBR1, TGFBR2, THRB, TRIM37, TRIP11, TRPS1, TRPV4, TTC21B, WDR19, WDR35, WRN')">Список генов</button>
+                </div>
+                <div class="feature">
+                    <h3>Кожные заболевания</h3>
+                    <p>152 гена, 545.7 Kb. Кожные заболевания.</p>
+                    <button onclick="showGenes('ABCA12, ABCB6, ABCC6, ABHDS, ADAMTS2, ADAR, ALAD, ALAS2, ALDH3A2, ALOX12B, ALOXE3, AP151, ATM, ATP2A2, ATP2C1, ATP6V0A2, BLM, CARD14, CDH3, CDSN, CLDN1, COL17A1, COL1A1, COL1A2, COL3A1, COL5A1, COL5A2, COL7A1, CPOX, CTC1, CTSC, CYP4F22, DDB2, DKC1, DOCK8, DSG1, DSG4, DSP, DST, EBP, ECM1, EDA, EDAR, EDARADD, EFEMP2, ELN, ERCC2, ERCC3, ERCC4, ERCC5, EXPHS, FANCA, FANCC, FANCG, FECH, FERMT1, FLCN, FLG, GJB2, GJB3, GJB4, GJB6, GMAS, GORAB, GPR143, GSN, GTF2H5, HFE, HMBS, HR, IL36RN, ITGA3, ITGA6, ITGB4, JUP, KIT, KRT1, KRT10, KRT14, KRT16, KRT17, KRT2, KRT5, KRT6A, KRT6B, KRT6C, KRT81, KRT83, KRT86, KRT9, LAMA3, LAMB3, LAMC2, LIPH, LIPN, LOR, LPAR6, LYST, MBTPS2, NF1, NF2, NHP2, NIPA14, NOP10, NSDHL, OCA2, PKP1, PLEC, PLOD1, PNPLA1, POFUT1, POGLUT1, POLH, POMP, PPOX, PRKAR1A, PTCH1, PTCH2, PYCR1, RECQ14, RTE1, SLC27A4, SLC39A4, SLC45A2, SLURP1, SNAP29, SPINKS, SPRED1, ST14, STAT3, STS, SUFU, TERC, TERT, TGM1, TGM5, TINF2, TNXB, TRPV3, TSC1, TSC2, TTR, TXC2, TYR, TYRP1, UROD, UROS, WAS, WRAP53, XPA, XPC, ZMPSTE24')">Список генов</button>
+                </div>
+                <div class="feature full-width">
+                    <h3>Клинический экзом</h3>
+                    <p>Gene count 5,516 / 7,563 genes<br>Covered region CDS, hotspots, Mitochondrial genome<br>Target size 13.8 / 19.6 Mb<br>Mutation type SNV, Indel, CNV<br>Sample type(amount) Blood (> 50 ng of fragmented DNA)</p>
+                </div>
+                <div class="feature full-width">
+                    <h3>Полный экзом</h3>
+                    <p>Target size 37.1 Mb<br>Covered region CCDS, RefSeq, GENCODE</p>
+                </div>
+            </div>
+        </section>
+        <section id="contact" class="section">
+            <h2>Контакты</h2>
+            <p>ООО "БиоЛайн" - эксклюзивный дистрибьютор CELEMICS в России и Беларуси:</p>
+            <ul>
+                <li>Адрес: 197022, Санкт-Петербург, ул. Профессора Попова, д. 23, Лит. Е</li>
+                <li>Телефон: 8 (812) 320-49-49</li>
+                <li>Email: <a href="mailto:main@bioline.ru">main@bioline.ru</a></li>
+            </ul>
+        </section>
+    </div>
+    <footer>
+        <p>&copy; 2025 ООО "БиоЛайн". Все права защищены.</p>
+    </footer>
+
+    <!-- Кнопка "Вверх" -->
+    <button class="scroll-to-top" onclick="scrollToTop()">↑</button>
+
+    <!-- Модальное окно -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <div id="requestFormModal" class="request-form">
+                <h2>Запрос на создание пользовательской панели</h2>
+                <input type="text" placeholder="Компания" id="company" required>
+                <input type="text" placeholder="Основной контакт" id="mainContact" required>
+                <input type="email" placeholder="Контактная информация (email)" id="contactInfo" required>
+                <input type="text" placeholder="Название дизайна" id="designName" required>
+                <input type="text" placeholder="Название заболевания (если есть)" id="diseaseName">
+                <select id="referenceVersion" required>
+                    <option value="GRCh37">GRCh37 (hg19)</option>
+                    <option value="GRCh38">GRCh38 (hg38)</option>
+                </select>
+                <select id="geneDatabase" required>
+                    <option value="RefSeq">RefSeq</option>
+                </select>
+                <input type="number" placeholder="Homolog Cut-off" id="homologCutoff" value="0" required>
+                <select id="geneType" required>
+                    <option value="CDS">Coding Sequence Only (CDS)</option>
+                    <option value="CDS+UTR">Coding Sequence + UTR</option>
+                </select>
+                <input type="number" placeholder="Expand (base pairs)" id="expand" value="0" required>
+                <textarea placeholder="Список генов или NM ID (по одному на строку)" id="geneList" rows="5" required></textarea>
+                <textarea placeholder="Fusions: введите хромосому, начало и конец" id="fusionRegions" rows="3"></textarea>
+                <textarea placeholder="Hotspots: введите хромосому, начало и конец" id="hotspotRegions" rows="3"></textarea>
+                <textarea placeholder="Другие регионы: введите хромосому, начало и конец" id="otherRegions" rows="3"></textarea>
+                <textarea placeholder="Синтезируемые последовательности: введите имя и последовательность" id="synthesisSequences" rows="3"></textarea>
+                <textarea placeholder="Примечания" id="notes" rows="3"></textarea>
+                <button onclick="generatePDF()">Скачать PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showGenes(genes) {
+            alert("Список генов:\n" + genes);
+        }
+
+        function showDiseases(diseases) {
+            alert("Список заболеваний:\n" + diseases);
+        }
+
+        // Функция для прокрутки страницы вверх
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Показывать или скрывать кнопку "Вверх" в зависимости от прокрутки страницы
+        window.onscroll = function() {
+            const scrollToTopButton = document.querySelector('.scroll-to-top');
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                scrollToTopButton.style.display = 'flex';
+            } else {
+                scrollToTopButton.style.display = 'none';
+            }
+        };
+
+        // Функция для отображения модального окна
+        function showModal() {
+            const modal = document.getElementById('modal');
+            modal.style.display = 'flex';
+        }
+
+        // Функция для закрытия модального окна
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            modal.style.display = 'none';
+        }
+
+        // Функция для генерации PDF
+        async function generatePDF() {
+            try {
+                // Сбор данных из формы
+                const company = document.getElementById('company').value;
+                const mainContact = document.getElementById('mainContact').value;
+                const contactInfo = document.getElementById('contactInfo').value;
+                const designName = document.getElementById('designName').value;
+                const diseaseName = document.getElementById('diseaseName').value;
+                const referenceVersion = document.getElementById('referenceVersion').value;
+                const geneDatabase = document.getElementById('geneDatabase').value;
+                const homologCutoff = document.getElementById('homologCutoff').value;
+                const geneType = document.getElementById('geneType').value;
+                const expand = document.getElementById('expand').value;
+                const geneList = document.getElementById('geneList').value;
+                const fusionRegions = document.getElementById('fusionRegions').value;
+                const hotspotRegions = document.getElementById('hotspotRegions').value;
+                const otherRegions = document.getElementById('otherRegions').value;
+                const synthesisSequences = document.getElementById('synthesisSequences').value;
+                const notes = document.getElementById('notes').value;
+
+                // Создание PDF с использованием pdf-lib
+                const { PDFDocument, StandardFonts } = PDFLib;
+                const pdfDoc = await PDFDocument.create();
+                const page = pdfDoc.addPage([600, 800]);
+
+                // Используем стандартный шрифт (Helvetica)
+                const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+                // Добавляем текст на страницу
+                let y = 750; // Начальная позиция текста
+                const addText = (text, size, x, y) => {
+                    page.drawText(text, {
+                        x,
+                        y,
+                        size,
+                        font: font,
+                    });
+                };
+
+                // Заголовок
+                addText("Celemics Custom Panel Design Request", 20, 50, y);
+                y -= 30;
+
+                // Раздел 1: Информация о запросе
+                addText("1. Request Information", 16, 50, y);
+                y -= 20;
+                addText(`Company: ${company}`, 12, 50, y);
+                y -= 15;
+                addText(`Main Contact: ${mainContact}`, 12, 50, y);
+                y -= 15;
+                addText(`Contact Info: ${contactInfo}`, 12, 50, y);
+                y -= 15;
+                addText(`Design Name: ${designName}`, 12, 50, y);
+                y -= 15;
+                addText(`Disease Name: ${diseaseName}`, 12, 50, y);
+                y -= 30;
+
+                // Раздел 2: Настройки дизайна
+                addText("2. Design Settings", 16, 50, y);
+                y -= 20;
+                addText(`Reference Version: ${referenceVersion}`, 12, 50, y);
+                y -= 15;
+                addText(`Gene Database: ${geneDatabase}`, 12, 50, y);
+                y -= 15;
+                addText(`Homolog Cut-off: ${homologCutoff}`, 12, 50, y);
+                y -= 30;
+
+                // Раздел 3: Список генов (NM ID)
+                addText("3. Gene List (NM ID)", 16, 50, y);
+                y -= 20;
+                addText(`Type: ${geneType}`, 12, 50, y);
+                y -= 15;
+                addText(`Expand: ${expand}`, 12, 50, y);
+                y -= 15;
+                addText(`Gene List or NM ID:`, 12, 50, y);
+                y -= 15;
+                addText(geneList, 12, 50, y);
+                y -= 30;
+
+                // Раздел 4: Пользовательские регионы
+                addText("4. Custom Regions", 16, 50, y);
+                y -= 20;
+                addText(`Fusions:`, 12, 50, y);
+                y -= 15;
+                addText(fusionRegions, 12, 50, y);
+                y -= 30;
+                addText(`Hotspots:`, 12, 50, y);
+                y -= 15;
+                addText(hotspotRegions, 12, 50, y);
+                y -= 30;
+                addText(`Other Regions:`, 12, 50, y);
+                y -= 15;
+                addText(otherRegions, 12, 50, y);
+                y -= 30;
+
+                // Раздел 5: Синтезируемые последовательности
+                addText("5. Synthesis Sequences", 16, 50, y);
+                y -= 20;
+                addText(synthesisSequences, 12, 50, y);
+                y -= 30;
+
+                // Раздел 6: Примечания
+                addText("6. Notes", 16, 50, y);
+                y -= 20;
+                addText(notes, 12, 50, y);
+
+                // Сохранение PDF
+                const pdfBytes = await pdfDoc.save();
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'Celemics_Design_Request.pdf';
+                link.click();
+               
+            } catch (error) {
+                console.error("Error generating PDF:", error);
+                alert("An error occurred while generating the PDF. Please check the console for details.");
+            }
+        }
+    </script>
+</body>
+</html>
