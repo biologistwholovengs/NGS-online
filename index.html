@@ -13,17 +13,20 @@
             align-items: center;
             height: 100vh;
             background-color: white;
-            overflow: hidden;
             font-family: Arial, sans-serif;
             position: relative;
+            overflow: hidden;
         }
 
         .dna-wrapper {
-            position: relative;
+            position: absolute;
             width: 200px;
             height: 200px;
             animation: rotate 10s linear infinite;
-            z-index: 1; /* Анимация поверх кнопок */
+            z-index: 1;
+            top: 20%; /* Высота остается прежней */
+            left: -50px; /* Сместил еще левее */
+            transform: translate(-50%, -50%);
         }
 
         .dna {
@@ -67,8 +70,7 @@
 
         .content {
             text-align: center;
-            margin-top: 20px;
-            z-index: 2; /* Текст поверх кнопок */
+            z-index: 2;
             position: relative;
         }
 
@@ -79,10 +81,10 @@
         }
 
         .content p {
-            font-size: 1.4rem; /* Увеличенный шрифт */
+            font-size: 1.4rem;
             color: #333;
             margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Добавлен объем (тень) */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         .buttons {
@@ -91,121 +93,58 @@
             height: 100%;
             top: 0;
             left: 0;
-            pointer-events: none; /* Отключаем события для контейнера, чтобы они работали только для кнопок */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        /* Верхняя часть кнопок */
+        .upper-buttons {
+            position: absolute;
+            top: 8%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            pointer-events: all;
+        }
+
+        /* Нижняя часть кнопок */
+        .lower-buttons {
+            position: absolute;
+            bottom: 8%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            pointer-events: all;
         }
 
         .buttons button {
-            position: absolute;
-            border-radius: 50%;
+            width: 250px;
+            height: 60px;
             background-color: green;
             color: white;
-            font-size: 1rem;
+            font-size: 1.2rem;
             border: none;
             cursor: pointer;
-            pointer-events: all; /* Включаем события для кнопок */
+            border-radius: 10px;
             transition: background-color 0.3s ease, transform 0.3s ease;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 0; /* Убираем внутренние отступы */
         }
 
         .buttons button:hover {
             background-color: darkgreen;
-            transform: scale(1.1); /* Увеличение на 10% при наведении */
+            transform: scale(1.05);
         }
 
-        /* Увеличение кнопок */
-        .buttons button:nth-child(1) {
-            width: 200px;
-            height: 200px;
-            font-size: 1.5rem;
-        }
-
-        .buttons button:nth-child(2),
-        .buttons button:nth-child(3) {
-            width: 150px;
-            height: 150px;
-            font-size: 1.2rem;
-        }
-
-        /* Новая кнопка "Скачать каталог (англ)" */
-        .buttons button:nth-child(4) {
-            width: 150px;
-            height: 150px;
-            font-size: 1.2rem;
-        }
-
-        /* Расположение кнопок с учетом границ текста и анимации */
-        .buttons button:nth-child(1) {
-            top: 10%;
-            left: 10%;
-        }
-
-        .buttons button:nth-child(2) {
-            top: 10%;
-            right: 10%;
-        }
-
-        .buttons button:nth-child(3) {
-            bottom: 10%;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        /* Расположение новой кнопки */
-        .buttons button:nth-child(4) {
-            bottom: 10%;
-            right: 10%;
-        }
-
+        /* Для мобильных устройств */
         @media (max-width: 600px) {
-            .dna-wrapper {
-                width: 150px;
-                height: 150px;
-            }
-
-            .content h1 {
-                font-size: 2rem;
-            }
-
-            .content p {
-                font-size: 1.2rem; /* Увеличенный шрифт для мобильных устройств */
-            }
-
-            /* Уменьшение кнопок для мобильных устройств */
-            .buttons button:nth-child(1) {
-                width: 120px;
-                height: 120px;
-                font-size: 1.2rem;
-                top: 10%;
-                left: 5%;
-            }
-
-            .buttons button:nth-child(2),
-            .buttons button:nth-child(3),
-            .buttons button:nth-child(4) {
-                width: 90px;
-                height: 90px;
-                font-size: 0.9rem;
-            }
-
-            .buttons button:nth-child(2) {
-                top: 10%;
-                right: 5%;
-            }
-
-            .buttons button:nth-child(3) {
-                bottom: 10%;
-                left: 50%;
-                transform: translateX(-50%);
-            }
-
-            /* Расположение новой кнопки на мобильных устройствах */
-            .buttons button:nth-child(4) {
-                bottom: 10%;
-                right: 5%;
+            .buttons button {
+                width: 200px;
+                height: 50px;
+                font-size: 1rem;
             }
         }
     </style>
@@ -218,11 +157,21 @@
         <h1>NGS от БиоЛайн</h1>
         <p>Исследуйте увлекательный мир генетики и биологии вместе с нами</p>
     </div>
+
     <div class="buttons">
-        <button onclick="handlePanelsClick()">Панели</button>
-        <button onclick="handleHandbookClick()">Справочник</button>
-        <button onclick="handleTestYourselfClick()">Проверь себя</button>
-        <button onclick="handleDownloadCatalogClick()">Скачать каталог<br>(англ)</button>
+        <!-- Верхняя часть кнопок -->
+        <div class="upper-buttons">
+            <button onclick="handlePanelsClick()">Панели</button>
+            <button onclick="handleHandbookClick()">Справочник</button>
+            <button onclick="handleTestYourselfClick()">Проверь себя</button>
+        </div>
+
+        <!-- Нижняя часть кнопок -->
+        <div class="lower-buttons">
+            <button onclick="handleCalendarClick()">Календарь мероприятий</button>
+            <button onclick="handleDownloadCatalogClick()">Скачать каталог (англ)</button>
+            <button class="empty">Пустая кнопка</button>
+        </div>
     </div>
 
     <script>
@@ -241,11 +190,14 @@
             window.location.href = "Test NGS 50.html";
         }
 
+        // Обработчик для кнопки "Календарь мероприятий"
+        function handleCalendarClick() {
+            window.location.href = "Calendar NGS big.html";
+        }
+
         // Обработчик для кнопки "Скачать каталог (англ)"
         function handleDownloadCatalogClick() {
-            // Укажите путь к файлу
             const fileUrl = 'Product-Overview_Celemics-Products_Service-Catalogue_en 2024.pdf';
-            // Открываем файл в новой вкладке
             window.open(fileUrl, '_blank');
         }
     </script>
