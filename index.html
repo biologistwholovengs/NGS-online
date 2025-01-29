@@ -24,8 +24,8 @@
             height: 200px;
             animation: rotate 10s linear infinite;
             z-index: 1;
-            top: 20%; /* Высота остается прежней */
-            left: -50px; /* Сместил еще левее */
+            top: 15%; /* Поднял чуть выше */
+            left: -50px;
             transform: translate(-50%, -50%);
         }
 
@@ -72,6 +72,7 @@
             text-align: center;
             z-index: 2;
             position: relative;
+            margin-top: -30px; /* Немного сместил вниз для более точного выравнивания */
         }
 
         .content h1 {
@@ -103,7 +104,7 @@
         /* Верхняя часть кнопок */
         .upper-buttons {
             position: absolute;
-            top: 8%;
+            top: 5%; /* Сместил немного выше */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -114,7 +115,7 @@
         /* Нижняя часть кнопок */
         .lower-buttons {
             position: absolute;
-            bottom: 8%;
+            bottom: 5%; /* Сместил немного выше */
             display: flex;
             flex-direction: column;
             align-items: center;
