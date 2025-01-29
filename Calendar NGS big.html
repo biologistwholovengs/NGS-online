@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Календарь выставок 2025</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .calendar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-y: scroll;
+            width: 100%;
+            max-width: 800px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .month {
+            width: 100%;
+            text-align: center;
+            margin: 10px 0;
+        }
+        .week {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        .day {
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #ddd;
+            position: relative;
+            border-radius: 8px;
+            margin: 5px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            padding: 5px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        .event-day {
+            position: relative;
+        }
+        .event-day span {
+            background-color: darkgreen;
+            color: white;
+            border-radius: 50%;
+            padding: 10px;
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            line-height: 30px;
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .saturday {
+            background-color: lightcoral;
+        }
+        .sunday {
+            background-color: red;
+            color: white;
+        }
+        .today {
+            transform: scale(1.2);
+            background-color: lightgreen;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 50%;
+            text-align: center;
+        }
+        .close-btn {
+            margin-top: 10px;
+            padding: 5px 10px;
+            cursor: pointer;
+            background: #ccc;
+            border: none;
+        }
+        .back-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px; /* Переместили в правый угол */
+            background-color: green;
+            color: white;
+            border: none;
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            z-index: 1000; /* Перемещаем кнопку на передний план */
+        }
+        /* Убрали стрелку */
+        /* .back-btn::before {
+            content: '\\2190'; 
+            color: white;
+            font-size: 24px;
+        } */
+        @media (max-width: 768px) {
+            .week {
+                grid-template-columns: repeat(7, 1fr);
+                gap: 5px;
+            }
+            .day {
+                height: 60px;
+                font-size: 14px;
+            }
+            .modal-content {
+                width: 80%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-btn" onclick="window.location.href='index.html'"></button>
+    <div class="calendar" id="calendar"></div>
+    <div class="modal" id="modal">
+        <div class="modal-content" id="modal-content">
+            <button class="close-btn" onclick="closeModal()">Закрыть</button>
+        </div>
+    </div>
+    <script>
+        const events = {
+            "2025-01-25": "Мамам Про, Санкт-Петербург",
+            "2025-02-09": "ЗаРождение, Санкт-Петербург",
+            "2025-02-15": "ДОД 'Лапино', Москва",
+            "2025-02-13": "Конгресс 'Онкорадиология', Москва",
+            "2025-02-19": "Форум 'Неотложная детская хирургия', Москва",
+            "2025-02-27": "Образовательный курс, Иркутск",
+            "2025-02-27": "Конгресс РКММИ, Москва",
+            "2025-03-01": "Выставка 'Babylife Expo', Москва",
+        };
+
+        function generateCalendar() {
+            const calendar = document.getElementById("calendar");
+            let today = new Date();
+            let todayStr = `2025-${(today.getMonth()+1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+            for (let month = 0; month < 12; month++) {
+                let monthDiv = document.createElement("div");
+                monthDiv.className = "month";
+                monthDiv.innerHTML = `<h2>${new Date(2025, month).toLocaleString('ru', { month: 'long' })} 2025</h2>`;
+                let daysDiv = document.createElement("div");
+                daysDiv.className = "week";
+
+                let firstDayOfMonth = new Date(2025, month, 1);
+                let firstDay = (firstDayOfMonth.getDay() === 0) ? 6 : firstDayOfMonth.getDay() - 1;  // Изменяем начало недели на понедельник
+
+                // Заполняем пустые ячейки до первого понедельника
+                for (let i = 0; i < firstDay; i++) {
+                    let emptyDiv = document.createElement("div");
+                    emptyDiv.className = "day";
+                    daysDiv.appendChild(emptyDiv);
+                }
+
+                // Определяем количество дней в месяце, чтобы правильно отобразить 31-е
+                const daysInMonth = new Date(2025, month + 1, 0).getDate();
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    let date = new Date(2025, month, day);
+                    let dateStr = `2025-${(month+1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+                    let dayDiv = document.createElement("div");
+                    dayDiv.className = "day";
+                    if (date.getDay() === 0) {
+                        dayDiv.classList.add("sunday");
+                    } else if (date.getDay() === 6) {
+                        dayDiv.classList.add("saturday");
+                    }
+                    if (dateStr === todayStr) {
+                        dayDiv.classList.add("today");
+                    }
+                    if (events[dateStr]) {
+                        dayDiv.innerHTML = `<span>${day}</span>`;
+                        dayDiv.classList.add("event-day");
+                        dayDiv.onclick = () => showModal(events[dateStr]);
+                    } else {
+                        dayDiv.innerText = day;
+                    }
+                    daysDiv.appendChild(dayDiv);
+                }
+                monthDiv.appendChild(daysDiv);
+                calendar.appendChild(monthDiv);
+            }
+        }
+
+        function showModal(content) {
+            document.getElementById("modal-content").innerHTML = `<p>${content}</p><button class='close-btn' onclick='closeModal()'>Закрыть</button>`;
+            document.getElementById("modal").style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById("modal").style.display = "none";
+        }
+
+        generateCalendar();
+    </script>
+</body>
+</html>
