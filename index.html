@@ -1,21 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>NGS от БиоЛайн</title>
     <style>
         body {
             margin: 0;
-            padding: 0;
+            padding: 0 10px;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             background-color: white;
-            overflow: hidden;
             font-family: Arial, sans-serif;
+            box-sizing: border-box;
+        }
+
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            max-width: 1000px;
+            width: 100%;
+            height: 100%;
             position: relative;
+            box-sizing: border-box;
+            gap: 5px;
+        }
+
+        .animation-container {
+            position: relative;
+            width: 80%;
+            display: flex;
+            justify-content: flex-start;
+            box-sizing: border-box;
         }
 
         .dna-wrapper {
@@ -24,6 +44,46 @@
             height: 200px;
             animation: rotate 10s linear infinite;
             z-index: 1;
+            transform: translate(-50%, -50%);
+            box-sizing: border-box;
+        }
+
+        .upper-buttons-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+
+        .button-grid {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .text-content-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        .text-content {
+            text-align: center;
+            display: inline-block;
+            position: relative;
+            z-index: 2;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .lower-buttons-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            box-sizing: border-box;
         }
 
         .dna {
@@ -65,149 +125,148 @@
             }
         }
 
-        .content {
-            text-align: center;
-            margin-top: 20px;
-            z-index: 2;
-            position: relative;
-            max-width: 80%; /* Ограничим ширину текста */
-             padding: 0 20px;
-        }
-
-         .content h1 {
-            font-size: 2.2rem;
+        .title {
+            font-size: 2.5rem;
             color: green;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-         }
-
-        .content p {
-            font-size: 1.2rem;
-            color: #333;
-            margin-bottom: 20px;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-            line-height: 1.5;
         }
 
-         .buttons {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            pointer-events: none;
+        .description {
+            font-size: 1.4rem;
+            color: #333;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .upper-buttons,
+        .lower-buttons {
             display: flex;
+            justify-content: center; /* Выравнивание кнопок по центру */
+            width: 100%;
+            pointer-events: all;
             flex-wrap: wrap;
-             justify-content: center;
-            align-items: center;
-         }
+            gap: 10px; /* Увеличенный отступ между кнопками */
+            padding: 0 20px; /* Отступ от краев контейнера */
+        }
 
         .buttons button {
-            position: relative;
-            border-radius: 50%;
+            height: 50px;
             background-color: green;
             color: white;
-            font-size: 0.8rem; /* Увеличиваем размер шрифта */
+            font-size: 1rem;
             border: none;
             cursor: pointer;
-            pointer-events: all;
+            border-radius: 10px;
+            flex: 0 0 auto; /* Отменяем flex-grow и flex-shrink */
+            width: 230px; /* Фиксированная ширина кнопок */
             transition: background-color 0.3s ease, transform 0.3s ease;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 0;
-            margin: 15px; /* Увеличиваем отступы */
-             width: 100px;  /* Увеличиваем размер кнопки */
-            height: 100px;
         }
 
-         .buttons button:hover {
-             background-color: darkgreen;
-             transform: scale(1.1);
-         }
+        .buttons button:hover {
+            background-color: darkgreen;
+            transform: scale(1.05);
+        }
 
-          @media (max-width: 768px) {
+        .empty-button {
+            background-color: #ddd;
+            color: #888;
+            cursor: not-allowed;
+        }
+
+        .empty-button:hover {
+            transform: scale(1);
+            background-color: #ddd;
+        }
+
+        /* Для мобильных устройств */
+        @media (max-width: 600px) {
+            .title {
+                font-size: 1.8rem;
+            }
+
+            .description {
+                font-size: 1rem;
+            }
+
+            .buttons button {
+                font-size: 0.9rem;
+                height: 45px;
+                width: 120px; /* Уменьшенная ширина кнопок для мобильных устройств */
+            }
+
             .dna-wrapper {
                 width: 150px;
                 height: 150px;
             }
-
-            .content h1 {
-                font-size: 1.8rem;
-            }
-
-            .content p {
-                font-size: 1rem;
-            }
-
-             .buttons button {
-                 width: 80px;  /* Уменьшаем размер кнопки */
-                height: 80px;  /* Уменьшаем размер кнопки */
-               font-size: 0.7rem;
-            }
         }
 
-        @media (max-width: 480px) {
-            .dna-wrapper {
-                width: 100px;
-                height: 100px;
-            }
-
-             .content h1 {
+        @media (max-width: 900px) and (orientation: landscape) {
+            .title {
                 font-size: 1.6rem;
             }
 
-            .content p {
+            .description {
                 font-size: 0.9rem;
             }
 
             .buttons button {
-                 width: 70px;
-                height: 70px;
-                font-size: 0.6rem;
+                font-size: 0.8rem;
+                height: 40px;
+                width: 100px; /* Уменьшенная ширина кнопок для ландшафтного режима */
             }
-         }
+
+            .dna-wrapper {
+                width: 100px;
+                height: 100px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="dna-wrapper">
-        <div class="dna"></div>
+    <div class="main-container">
+        <div class="animation-container">
+            <div class="dna-wrapper">
+                <div class="dna"></div>
+            </div>
+        </div>
+        <div class="upper-buttons-container">
+            <div class="button-grid">
+                <div class="upper-buttons buttons">
+                    <button onclick="window.location.href='CELEMICS panels order form.html'">Панели</button>
+                    <button onclick="window.location.href='Directory 700.html'">Справочник</button>
+                    <button onclick="window.location.href='Test NGS 50.html'">Проверь себя</button>
+                </div>
+            </div>
+        </div>
+        <div class="text-content-container">
+            <div class="text-content">
+                <h1 class="title">NGS от БиоЛайн</h1>
+                <p class="description">Исследуйте увлекательный мир генетики и биологии вместе с нами</p>
+            </div>
+        </div>
+        <div class="lower-buttons-container">
+            <div class="button-grid">
+                <div class="lower-buttons buttons">
+                    <button onclick="window.location.href='Calendar NGS big.html'">Календарь мероприятий</button>
+                    <button onclick="window.location.href='Product-Overview_Celemics-Products_Service-Catalogue_en 2024.pdf'" download>Скачать каталог</button>
+                    <button class="empty-button" disabled>Пустая кнопка</button>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="content">
-        <h1>NGS от БиоЛайн</h1>
-        <p>Исследуйте увлекательный мир генетики и биологии вместе с нами</p>
-    </div>
-    <div class="buttons">
-        <button onclick="handlePanelsClick()">Панели</button>
-        <button onclick="handleHandbookClick()">Справочник</button>
-        <button onclick="handleTestYourselfClick()">Проверь себя</button>
-        <button onclick="handleDownloadCatalogClick()">Скачать каталог<br>(англ)</button>
-         <button onclick="handleCalendarClick()">Календарь мероприятий</button>
-         <button></button>
-    </div>
-
     <script>
-        function handlePanelsClick() {
-            window.location.href = "CELEMICS panels order form.html";
-        }
-
-        function handleHandbookClick() {
-            window.location.href = "Directory 700.html";
-        }
-
-        function handleTestYourselfClick() {
-            window.location.href = "Test NGS 50.html";
-        }
-
-         function handleDownloadCatalogClick() {
-             const fileUrl = 'Product-Overview_Celemics-Products_Service-Catalogue_en 2024.pdf';
-              window.open(fileUrl, '_blank');
-        }
-        function handleCalendarClick() {
-             window.location.href = "Calendar NGS big.html";
-        }
+        document.addEventListener("DOMContentLoaded", function() {
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('portrait').catch(function(error) {
+                    console.error('Error locking screen orientation: ', error);
+                });
+            }
+            const mainContainer = document.querySelector('.main-container');
+            function checkOverflow() {
+                
+            }
+            checkOverflow();
+            window.addEventListener('resize', checkOverflow);
+        });
     </script>
 </body>
 </html>
-
