@@ -142,10 +142,10 @@
             display: flex;
             justify-content: center; /* Выравнивание кнопок по центру */
             width: 100%;
-            pointer-events: all;
+             pointer-events: all;
             flex-wrap: wrap;
             gap: 10px; /* Увеличенный отступ между кнопками */
-            padding: 0 20px; /* Отступ от краев контейнера */
+             padding: 0 20px; /* Отступ от краев контейнера */
         }
 
         .buttons button {
@@ -157,25 +157,25 @@
             cursor: pointer;
             border-radius: 10px;
             flex: 0 0 auto; /* Отменяем flex-grow и flex-shrink */
-            width: 230px; /* Фиксированная ширина кнопок */
+             width: 230px; /* Фиксированная ширина кнопок */
             transition: background-color 0.3s ease, transform 0.3s ease;
         }
 
         .buttons button:hover {
             background-color: darkgreen;
-            transform: scale(1.05);
+           transform: scale(1.05);
         }
 
         .empty-button {
-            background-color: #ddd;
+           background-color: #ddd;
             color: #888;
             cursor: not-allowed;
         }
 
         .empty-button:hover {
-            transform: scale(1);
-            background-color: #ddd;
-        }
+           transform: scale(1);
+             background-color: #ddd;
+       }
 
         /* Для мобильных устройств */
         @media (max-width: 600px) {
@@ -184,11 +184,11 @@
             }
 
             .description {
-                font-size: 1rem;
-            }
+               font-size: 1rem;
+           }
 
             .buttons button {
-                font-size: 0.9rem;
+               font-size: 0.9rem;
                 height: 45px;
                 width: 120px; /* Уменьшенная ширина кнопок для мобильных устройств */
             }
@@ -201,23 +201,23 @@
 
         @media (max-width: 900px) and (orientation: landscape) {
             .title {
-                font-size: 1.6rem;
-            }
+               font-size: 1.6rem;
+           }
 
             .description {
-                font-size: 0.9rem;
-            }
+               font-size: 0.9rem;
+           }
 
             .buttons button {
                 font-size: 0.8rem;
-                height: 40px;
-                width: 100px; /* Уменьшенная ширина кнопок для ландшафтного режима */
+                 height: 40px;
+               width: 100px; /* Уменьшенная ширина кнопок для ландшафтного режима */
             }
 
             .dna-wrapper {
-                width: 100px;
-                height: 100px;
-            }
+               width: 100px;
+                 height: 100px;
+           }
         }
     </style>
 </head>
@@ -237,18 +237,18 @@
                 </div>
             </div>
         </div>
-        <div class="text-content-container">
+       <div class="text-content-container">
             <div class="text-content">
                 <h1 class="title">NGS от БиоЛайн</h1>
-                <p class="description">Исследуйте увлекательный мир генетики и биологии вместе с нами</p>
+               <p class="description">Исследуйте увлекательный мир генетики и биологии вместе с нами</p>
             </div>
         </div>
-        <div class="lower-buttons-container">
+       <div class="lower-buttons-container">
             <div class="button-grid">
                 <div class="lower-buttons buttons">
                     <button onclick="window.location.href='Calendar NGS big.html'">Календарь мероприятий</button>
-                    <button onclick="window.location.href='Product-Overview_Celemics-Products_Service-Catalogue_en 2024.pdf'" download>Скачать каталог</button>
-                    <button class="empty-button" disabled>Пустая кнопка</button>
+                    <button onclick="handleDownloadCatalogClick()">Скачать каталог (англ)</button>
+                    <button class="empty-button" onclick="handleNGSGameClick()">NGS game</button>
                 </div>
             </div>
         </div>
@@ -262,11 +262,19 @@
             }
             const mainContainer = document.querySelector('.main-container');
             function checkOverflow() {
-                
+
             }
             checkOverflow();
-            window.addEventListener('resize', checkOverflow);
-        });
+           window.addEventListener('resize', checkOverflow);
+       });
+         // Обработчик для кнопки "Скачать каталог (англ)"
+         function handleDownloadCatalogClick() {
+            const fileUrl = 'Product-Overview_Celemics-Products_Service-Catalogue_en 2024.pdf';
+             window.open(fileUrl, '_blank');
+        }
+        function handleNGSGameClick() {
+            window.location.href = "NGS game.html"
+        }
     </script>
 </body>
 </html>
