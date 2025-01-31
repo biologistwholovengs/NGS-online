@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Макет с Кружочками, Линией и Кнопками</title>
+    <style>
+        html {
+            min-height: 100vh;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+            padding-top: 50px;
+            box-sizing: border-box;
+            transition: background-color 0.1s ease;
+        }
+
+        .timer-container {
+            font-size: 30px;
+            cursor: pointer;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            user-select: none;
+            width: 120px;
+            text-align: center;
+            background-color: green;
+            color: white;
+            border: 2px solid #4caf50;
+            margin-top: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 1px solid red;
+            padding: 20px;
+            box-sizing: border-box;
+            position: fixed;
+            bottom: 0;
+            justify-content: flex-end;
+            overflow: hidden;
+            margin-top: 150px;
+             transition: background-color 0.1s ease;
+        }
+
+        .top-circles-container {
+            display: flex;
+            justify-content: center;
+            position: relative;
+            width: 100%;
+            height: 80px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .circles-container {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .circle-column {
+            display: flex;
+            flex-direction: column;
+            width: calc(100%/4);
+            align-items: center;
+        }
+
+        .circle-column-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .circle-column-wrapper::before {
+            content: "";
+            display: block;
+             width: 54px;
+           height: 54px;
+            border-radius: 50%;
+            background-color: #ccc;
+            margin-bottom: 2px;
+        }
+
+        .circle-column-wrapper span {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 30px;
+           color: black;
+        }
+         .circle-column-wrapper .colored-circle {
+        position: absolute;
+         top: 50%;
+         left: 50%;
+          transform: translate(-50%, -50%);
+        width: 54px;
+          height: 54px;
+           border-radius: 50%;
+    }
+
+        .circle-column-wrapper:last-child::before {
+            margin-bottom: 0px;
+        }
+
+        .line {
+            width: 100%;
+            height: 5px;
+           background-color: #808080;
+            margin-bottom: 20px;
+        }
+
+        .top-circle {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+           transition: opacity 0.5s ease-in-out;
+           opacity: 1;
+        }
+
+        .top-circle.hidden {
+            opacity: 0;
+        }
+
+        .buttons-container {
+            display: flex;
+            width: 100%;
+             justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .button {
+            width: 80px;
+            height: 80px;
+            border: none;
+            border-radius: 50%;
+           background-color: green;
+            color: white;
+           cursor: pointer;
+            margin: 10px;
+            font-size: 0;
+            padding: 0;
+        }
+
+        /* Адаптация под мобильные устройства */
+        @media (max-width: 480px) {
+           .container {
+                padding: 10px;
+           }
+
+            .circle-column-wrapper::before {
+                width: 36px;
+                height: 36px;
+            }
+
+            .button {
+                width: 60px;
+                height: 60px;
+           }
+
+            .circle-column-wrapper span {
+                 font-size: 20px;
+            }
+
+            .top-circle{
+                width: 36px;
+                height: 36px;
+               font-size: 20px;
+           }
+            .timer-container {
+               font-size: 20px;
+               padding: 5px;
+           }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="timer-container">0 сек</div>
+        <div class="top-circles-container"></div>
+        <div class="circles-container">
+            <div class="circle-column left-column"></div>
+            <div class="circle-column center-left-column"></div>
+            <div class="circle-column center-right-column"></div>
+           <div class="circle-column right-column"></div>
+       </div>
+        <div class="line"></div>
+        <div class="buttons-container">
+            <button class="button left-button" data-column="left-column"></button>
+            <button class="button center-left-button" data-column="center-left-column"></button>
+           <button class="button center-right-button" data-column="center-right-column"></button>
+           <button class="button right-button" data-column="right-column"></button>
+       </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+             const body = document.querySelector('body');
+             const container = document.querySelector('.container');
+            const timerContainer = document.querySelector('.timer-container');
+            let timerValue = 0;
+            let timerInterval;
+            let gameActive = false; // Состояние игры
+            const topCirclesContainer = document.querySelector('.top-circles-container');
+            const leftColumn = document.querySelector('.left-column');
+            const centerLeftColumn = document.querySelector('.center-left-column');
+            const centerRightColumn = document.querySelector('.center-right-column');
+            const rightColumn = document.querySelector('.right-column');
+            const numberOfCircles = 10;
+           const letters = ['A', 'T', 'G', 'C'];
+            let matchedCircles = {
+                'left-column': [],
+                'center-left-column': [],
+                'center-right-column': [],
+               'right-column': []
+            };
+            const colors = {
+                'A': 'green',
+               'T': 'red',
+                'G': 'blue',
+                 'C': 'yellow'
+            };
+           const match = {
+               'A': 'T',
+              'T': 'A',
+                'G': 'C',
+                'C': 'G'
+            }
+            function updateTimer() {
+               timerContainer.textContent = timerValue + ' сек'; // Добавление " сек"
+           }
+
+            function startTimer() {
+                timerInterval =  setInterval(() => {
+                    timerValue++;
+                    updateTimer();
+                }, 1000);
+            }
+          function stopTimer() {
+               clearInterval(timerInterval);
+           }
+            function resetGame() {
+                timerValue = 0;
+                updateTimer();
+                 matchedCircles = {
+                   'left-column': [],
+                    'center-left-column': [],
+                    'center-right-column': [],
+                   'right-column': []
+               };
+                 const allCircles = document.querySelectorAll('.circle-column-wrapper .colored-circle');
+                allCircles.forEach(circle => circle.remove());
+
+               gameActive = true;
+                startTimer();
+               showTopCircle();
+                  body.style.backgroundColor = '#f0f0f0';
+                container.style.backgroundColor = '#f0f0f0';
+           }
+            timerContainer.addEventListener('click', resetGame);
+           function getRandomLetter() {
+                 return letters[Math.floor(Math.random() * letters.length)];
+            }
+          function getRandomHorizontalPosition(container) {
+                const containerWidth = container.offsetWidth;
+                const circleWidth = 54;
+                 const randomPosition = Math.random() * (containerWidth - circleWidth);
+                 return randomPosition;
+           }
+            function createCircles(column) {
+               for (let i = 0; i < numberOfCircles; i++) {
+                    const circleWrapper = document.createElement('div');
+                    circleWrapper.classList.add('circle-column-wrapper');
+                  const letterSpan = document.createElement('span');
+                     letterSpan.textContent = getRandomLetter();
+                    circleWrapper.appendChild(letterSpan);
+                    column.appendChild(circleWrapper);
+               }
+            }
+            function createTopCircle() {
+                const topCircle = document.createElement('div');
+                const letter = getRandomLetter();
+                 topCircle.textContent = letter;
+                topCircle.classList.add('top-circle');
+                topCircle.style.backgroundColor = colors[letter];
+                topCircle.style.left = `${getRandomHorizontalPosition(topCirclesContainer)}px`;
+               return topCircle;
+            }
+            function showTopCircle() {
+              if(!gameActive) return;
+               const topCircle = createTopCircle();
+                 topCirclesContainer.appendChild(topCircle);
+                setTimeout(() => {
+                    topCircle.classList.add('hidden');
+                   setTimeout(() => {
+                       topCircle.remove();
+                    }, 500);
+                   showTopCircle();
+               }, 500);
+           }
+          function checkMatch(clickedButton, topCircle) {
+             const column = clickedButton.dataset.column;
+               const columnCircles = document.querySelectorAll(`.${column} .circle-column-wrapper`);
+              const matchLetter = match[topCircle.textContent];
+            
+            const matchIndex = numberOfCircles - 1 - matchedCircles[column].length;
+
+              if(!columnCircles[matchIndex]) {
+                  return;
+               }
+
+                const firstCircle = columnCircles[matchIndex].querySelector('span');
+                if (firstCircle && firstCircle.textContent === matchLetter) {
+                   const coloredCircle = document.createElement('div');
+                     coloredCircle.classList.add('colored-circle');
+                    coloredCircle.style.backgroundColor = colors[topCircle.textContent];
+                     columnCircles[matchIndex].appendChild(coloredCircle);
+                    matchedCircles[column].push(topCircle.textContent);
+
+
+                   if (matchedCircles[column].length >= numberOfCircles &&
+                       matchedCircles['left-column'].length >= numberOfCircles &&
+                     matchedCircles['center-left-column'].length >= numberOfCircles &&
+                      matchedCircles['center-right-column'].length >= numberOfCircles &&
+                        matchedCircles['right-column'].length >= numberOfCircles ) {
+                       stopTimer();
+                        gameActive = false;
+                       body.style.backgroundColor = 'lightgreen';
+                      container.style.backgroundColor = 'lightgreen';
+                    }
+               } else {
+                  body.style.backgroundColor = 'red';
+                   container.style.backgroundColor = 'red';
+                  setTimeout(() => {
+                      body.style.backgroundColor = '#f0f0f0';
+                     container.style.backgroundColor = '#f0f0f0';
+                  }, 100);
+                }
+            }
+            const buttons = document.querySelectorAll('.button');
+            buttons.forEach(button => {
+               button.addEventListener('click', function(){
+                    const currentTopCircle = topCirclesContainer.querySelector('.top-circle:not(.hidden)');
+                    if(currentTopCircle){
+                      checkMatch(this, currentTopCircle);
+                   }
+              });
+            });
+            createCircles(leftColumn);
+             createCircles(centerLeftColumn);
+            createCircles(centerRightColumn);
+           createCircles(rightColumn);
+             resetGame();
+        });
+    </script>
+</body>
+</html>
