@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Текст на белом фоне</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            min-height: 100vh;
+            background-color: white;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            box-sizing: border-box;
+             color: #333;
+        }
+
+        p:first-child {
+            font-size: 2.5rem;
+            color: green;
+             margin-bottom: 10px;
+        }
+
+        p:nth-child(2) {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        p{
+          font-size: 1.1rem;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+       .buttons-container {
+            display: flex;
+            flex-wrap: wrap;
+             margin-top: 10px;
+        }
+
+        .speed-button {
+            width: 50px;
+            height: 50px;
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+             margin: 5px;
+            display: flex;
+             justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+
+        }
+        .speed-button:hover {
+           background-color: darkgreen;
+           transform: scale(1.05);
+       }
+    </style>
+</head>
+<body>
+    <p>Помогите секвенатору прочитать ДНК</p>
+    <p>Вспомните, с какого конца происходит присоединение нуклеотидов в проточной ячейке</p>
+     <p>Выберите скорость</p>
+    <div class="buttons-container">
+        <button class="speed-button" onclick="window.location.href='NGS game 4.html'">1</button>
+        <button class="speed-button" onclick="window.location.href='NGS game 3 5.html'">2</button>
+        <button class="speed-button" onclick="window.location.href='NGS game 3.html'">3</button>
+        <button class="speed-button" onclick="window.location.href='NGS game 2 5.html'">4</button>
+        <button class="speed-button" onclick="window.location.href='NGS game 2.html'">5</button>
+        <button class="speed-button" onclick="window.location.href='NGS game 1 5.html'">6</button>
+        <button class="speed-button" onclick="window.location.href='NGS game 1.html'">7</button>
+        <button class="speed-button" onclick="window.location.href='NGS game 0 5 sec.html'">8</button>
+    </div>
+
+</body>
+</html>
