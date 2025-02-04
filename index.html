@@ -13,8 +13,69 @@
             align-items: center;
             min-height: 100vh;
             background-color: white;
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif; /* Изменим шрифт на Roboto */
             box-sizing: border-box;
+        }
+
+        .news-container {
+            max-width: 800px;
+            margin: auto;
+            display: none;
+            /* Увеличим отступ между карточками */
+            gap: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .news-item {
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+        }
+        .news-item h3 {
+            margin: 0;
+        }
+        .news-item a {
+            text-decoration: none;
+            color: blue;
+        }
+
+        /* Стили для карточек */
+        .news-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            background-color: #f5f5f5; /* Сделаем карточки немного серенькими */
+            transition: transform 0.2s ease-in-out; /* Анимация при наведении */
+            margin-bottom: 20px; /* Добавим отступ снизу */
+        }
+
+        .news-card:hover {
+            transform: scale(1.02); /* Небольшое увеличение при наведении */
+        }
+
+        .news-card h3 {
+            margin-top: 0;
+            font-size: 1.2em;
+        }
+
+        .news-card p {
+            font-size: 1em;
+            color: #333;
+        }
+
+        .news-card small {
+            color: #777;
+            font-size: 0.8em;
+        }
+
+        /* Убираем подчеркивание у ссылок в карточках */
+        .news-card a {
+            text-decoration: none;
+        }
+
+        /* Убираем подчеркивание у ссылок в новостях (чтобы наверняка) */
+        .news-item a {
+            text-decoration: none;
         }
 
         .main-container {
@@ -138,7 +199,8 @@
         }
 
         .upper-buttons,
-        .lower-buttons {
+        .lower-buttons,
+        .news-button-container {
             display: flex;
             justify-content: center; /* Выравнивание кнопок по центру */
             width: 100%;
@@ -148,7 +210,7 @@
              padding: 0 20px; /* Отступ от краев контейнера */
         }
 
-        .buttons button {
+        .buttons button, .news-button-container button {
             height: 50px;
             background-color: green;
             color: white;
@@ -161,7 +223,7 @@
             transition: background-color 0.3s ease, transform 0.3s ease;
         }
 
-        .buttons button:hover {
+        .buttons button:hover, .news-button-container button:hover {
             background-color: darkgreen;
            transform: scale(1.05);
         }
@@ -187,7 +249,7 @@
                font-size: 1rem;
            }
 
-            .buttons button {
+            .buttons button, .news-button-container button {
                font-size: 0.9rem;
                 height: 45px;
                 width: 120px; /* Уменьшенная ширина кнопок для мобильных устройств */
@@ -208,7 +270,7 @@
                font-size: 0.9rem;
            }
 
-            .buttons button {
+            .buttons button, .news-button-container button {
                 font-size: 0.8rem;
                  height: 40px;
                width: 100px; /* Уменьшенная ширина кнопок для ландшафтного режима */
@@ -220,14 +282,26 @@
            }
         }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="main-container">
+        <div class="news-container" id="news"></div>
+
+        <div class="upper-buttons-container">
+            <div class="button-grid">
+                <div class="news-button-container buttons">
+                    <button id="newsButton" onclick="toggleNews()">Новости NGS</button>
+                </div>
+            </div>
+        </div>
+
         <div class="animation-container">
             <div class="dna-wrapper">
                 <div class="dna"></div>
             </div>
         </div>
+
         <div class="upper-buttons-container">
             <div class="button-grid">
                 <div class="upper-buttons buttons">
@@ -237,6 +311,7 @@
                 </div>
             </div>
         </div>
+
        <div class="text-content-container">
             <div class="text-content">
                 <h1 class="title">NGS от БиоЛайн</h1>
@@ -254,7 +329,67 @@
         </div>
     </div>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        let newsVisible = false;
+        const API_KEY = 'fc3c4b6241faeb57a71a64d35269fcdb';
+        const NEWS_COUNT = 10;
+
+        async function fetchGNews() {
+            const url = `https://gnews.io/api/v4/search?q=NGS%20sequencing&lang=en&country=US&max=${NEWS_COUNT}&apikey=${API_KEY}`;
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+
+                const newsContainer = document.getElementById('news');
+                newsContainer.innerHTML = '';
+
+                if (data.articles && data.articles.length > 0) {
+                    data.articles.forEach(article => {
+                        const newsCard = document.createElement('div');
+                        newsCard.classList.add('news-card');
+
+                        const newsItemEl = document.createElement('div');
+                        newsItemEl.classList.add('news-item');
+                        newsItemEl.innerHTML = `
+                            <h3><a href="${article.url}" target="_blank" style="text-decoration: none;">${article.title}</a></h3>
+                            <p>${article.description || 'Нет описания'}</p>
+                            <small>${article.publishedAt ? new Date(article.publishedAt).toLocaleDateString() : 'Дата недоступна'}</small>
+                        `;
+                        newsCard.appendChild(newsItemEl);
+                        newsContainer.appendChild(newsCard);
+                    });
+                } else {
+                    newsContainer.innerHTML = `<p>Нет новостей для отображения.</p>`;
+                }
+
+            } catch (error) {
+                console.error('Error fetching GNews:', error);
+                const newsContainer = document.getElementById('news');
+                newsContainer.innerHTML = `<p style="color: red;">Ошибка загрузки новостей из GNews: ${error}</p>`;
+            }
+        }
+
+        function toggleNews() {
+            const newsContainer = document.getElementById('news');
+            const newsButton = document.getElementById('newsButton');
+            newsVisible = !newsVisible;
+
+            if (newsVisible) {
+                newsContainer.style.display = 'block';
+                newsContainer.innerHTML = '<p>Загрузка новостей...</p>';
+                fetchGNews();
+                newsButton.textContent = 'Скрыть Новости';
+            } else {
+                newsContainer.style.display = 'none';
+                newsContainer.innerHTML = '';
+                newsButton.textContent = 'Новости NGS';
+            }
+        }
+
+         document.addEventListener("DOMContentLoaded", function() {
             if (screen.orientation && screen.orientation.lock) {
                 screen.orientation.lock('portrait').catch(function(error) {
                     console.error('Error locking screen orientation: ', error);
