@@ -125,7 +125,7 @@
         }
         /* Убрали стрелку */
         /* .back-btn::before {
-            content: '\\2190'; 
+            content: '\\2190';
             color: white;
             font-size: 24px;
         } */
@@ -154,34 +154,88 @@
     </div>
     <script>
         const events = {
-            "2025-01-25": "Мамам Про, Санкт-Петербург",
-            "2025-02-09": "ЗаРождение, Санкт-Петербург",
-            "2025-02-15": "ДОД 'Лапино', Москва",
-            "2025-02-13": "Конгресс 'Онкорадиология', Москва",
-            "2025-02-19": "Форум 'Неотложная детская хирургия', Москва",
-            "2025-02-27": "Образовательный курс, Иркутск",
-            "2025-02-27": "Конгресс РКММИ, Москва",
-            "2025-03-01": "Выставка 'Babylife Expo', Москва",
+            "2025-01-25": ["Мамам Про, Санкт-Петербург"],
+            "2025-02-09": ["ЗаРождение, Санкт-Петербург"],
+            "2025-02-15": ["ДОД 'Лапино', Москва"],
+            "2025-02-13": ["Конгресс «Онкорадиология, лучевая диагностика и терапия», Москва"],
+            "2025-02-19": ["ХІІІ Всероссийский научно-практический форум «НЕОТЛОЖНАЯ ДЕТСКАЯ ХИРУРГИЯ И ТРАВМАТОЛОГИЯ», Москва"],
+            "2025-02-27": ["Образовательный курс по детской травматологии и ортопедии, Иркутск"],
+            "2025-03-01": ["Выставка 'Babylife Expo', Москва"],
+            "2025-03-03": ["ХІ междисциплинарная конференция памяти академика Миланова Н.О. «Актуальные вопросы микрохирургии», Москва"],
+             "2025-03-13": ["«Судебно-медицинская экспертиза массовых захоронений большой давности», Великий Новгород"],
+             "2025-03-14": ["ІІ научно-практическую конференцию им. П. Эрлиха «Актуальные вопросы иммунологической диагностики в онкологии», Обнинск"],
+             "2025-03-18": ["Выставка 'Лабораторная диагностика' 2025, Москва"],
+             "2025-03-21": ["Конгресс лабораторной гистотехнологии, Москва"],
+             "2025-03-23": ["ЗаРождение, Казань"],
+             "2025-04-06": ["ЗаРождение, Санкт-Петербург"],
+             "2025-04-07": ["Конференция нейрохирургов Северо-Кавказского Федерального округа, Marac"],
+             "2025-04-15": ["XIV Петербургский форум оториноларингологов России, Санкт-Петербург"],
+             "2025-04-15": ["TIHE, Узбекистан"],
+             "2025-04-18": ["Конгресс Российскрого общества онкопатологов (РООП), Москва"],
+             "2025-04-19": ["МамаПати, Москва"],
+             "2025-04-23": ["Аналитика Экспо, Москва"],
+             "2025-04-24": ["XXIV Всероссийская научно-практическая конференция «Поленовские чтения», Санкт-Петербург"],
+             "2025-04-24": ["Международный конгресс по пластической, реконструктивной хирургии и эстетической медицине, Казань"],
+             "2025-04-27": ["ЗаРождение, Екатеринбург"],
+             "2025-05-12": ["Сербиненковские чтения, Кострома"],
+             "2025-05-16": ["Выездная школа профессионального мастерства, Нижний Новгород"],
+             "2025-05-18": ["ЗаРождение, Москва"],
+             "2025-05-25": ["ЗаРождение, Тюмень"],
+             "2025-05-28": ["ХІІІ съезд Российской Ассоциации хирургов вертебрологов (RASS), Санкт-Петербург"],
+             "2025-06-01": ["Летний конгресс «Пластическая. реконструктивная хирургия и косметология», Санкт-Петербург"],
+             "2025-06-03": ["ХІІ ВСЕРОССИЙСКИЙ КОНГРЕСС ОБЩЕСТВА КИСТЕВЫХ ХИРУРГОВ, Казахстан"],
+             "2025-06-03": ["KIHE, Казахстан"],
+             "2025-06-03": ["Конференция СибГМУ (Генетические технологии в трансляционной биомедицине), Томск"],
+             "2025-06-06": ["Всероссийский форум оториноларингологов, Нижний Новгород"],
+             "2025-06-06": ["XV Пленум Российского общества патологоанатомов «Инновационные технологии в практике патологоанатомических исследований», Нижний Новгород"],
+             "2025-06-18": ["Всероссийский нейрохирургический Форум. Конференция молодых ученых, Москва"],
+             "2025-06-29": ["ЗаРождение, Казань"],
+             "2025-07-06": ["XV Пленум патологоанатомов 'Инновационные технологии в практике патологоанатомических исследований', Нижний Новгород"],
+             "2025-09-14": ["Детская хирургия головы и шеи, Светлогорск"],
+             "2025-09-15": ["Конференция нейрохирургов Дальневосточного Федерального округа, Петропавловск-Камчатский"],
+             "2025-09-19": ["Выездная школа профессионального мастерства, Тольятти"],
+             "2025-09-26": ["ХІІ ежегодная конференция нейрохирургов Северо-Западного Федерального округа, Санкт-Петербург"],
+             "2025-10-09": ["VI Всероссийский съезд по детской нейрохирургии, Москва"],
+             "2025-10-13": ["Конференция нейрохирургов Южного Федерального округа, Астрахань"],
+             "2025-10-14": ["РООП, Москва"],
+             "2025-10-14": ["Всероссийский конгресс Национальной медицинской ассоциации оториноларингологов, Екатеринбург"],
+             "2025-10-14": ["Диагностический Саммит, Москва"],
+             "2025-11-06": ["ХХХІ Съезд сердечно-сосудистых хирургов России, Москва"],
+             "2025-11-06": ["Нейрофест, Екатеринбург"],
+             "2025-11-11": ["МОЛЕКУЛЯРНАЯ ДИАГНОСТИКА 2025, Москва"],
+             "2025-11-21": ["Выездная школа профессионального мастерства, Тюмень"],
+             "2025-11-25": ["Pharmtech & Ingredients, Москва"],
+             "2025-12-08": ["Здравоохранение, Москва"]
         };
+
+        function createElement(type, className = '', textContent = '', attributes = {}) {
+            const element = document.createElement(type);
+            if (className) element.className = className;
+            if (textContent) element.textContent = textContent;
+            for (const key in attributes) {
+                element.setAttribute(key, attributes);
+            }
+            return element;
+        }
+
 
         function generateCalendar() {
             const calendar = document.getElementById("calendar");
-            let today = new Date();
-            let todayStr = `2025-${(today.getMonth()+1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+            let todayStr = '2025-07-15'; // Example fixed date
+
+
             for (let month = 0; month < 12; month++) {
-                let monthDiv = document.createElement("div");
-                monthDiv.className = "month";
+                const monthDiv = createElement('div', 'month');
                 monthDiv.innerHTML = `<h2>${new Date(2025, month).toLocaleString('ru', { month: 'long' })} 2025</h2>`;
-                let daysDiv = document.createElement("div");
-                daysDiv.className = "week";
+
+                const daysDiv = createElement('div', 'week', null, { role: 'grid' });
 
                 let firstDayOfMonth = new Date(2025, month, 1);
                 let firstDay = (firstDayOfMonth.getDay() === 0) ? 6 : firstDayOfMonth.getDay() - 1;  // Изменяем начало недели на понедельник
 
                 // Заполняем пустые ячейки до первого понедельника
                 for (let i = 0; i < firstDay; i++) {
-                    let emptyDiv = document.createElement("div");
-                    emptyDiv.className = "day";
+                    const emptyDiv = createElement('div', 'day', null, { role: 'gridcell' });
                     daysDiv.appendChild(emptyDiv);
                 }
 
@@ -190,35 +244,55 @@
 
                 for (let day = 1; day <= daysInMonth; day++) {
                     let date = new Date(2025, month, day);
-                    let dateStr = `2025-${(month+1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-                    let dayDiv = document.createElement("div");
-                    dayDiv.className = "day";
+                    let dateStr = `2025-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+
+                    const dayDiv = createElement('div', 'day', String(day), { role: 'gridcell' });
+
+
                     if (date.getDay() === 0) {
                         dayDiv.classList.add("sunday");
                     } else if (date.getDay() === 6) {
                         dayDiv.classList.add("saturday");
                     }
+
                     if (dateStr === todayStr) {
                         dayDiv.classList.add("today");
                     }
+
                     if (events[dateStr]) {
-                        dayDiv.innerHTML = `<span>${day}</span>`;
+                        const eventSpan = createElement('span', '', String(day));
+                        dayDiv.innerHTML = ''; // Clear the day number
+                        dayDiv.appendChild(eventSpan);
                         dayDiv.classList.add("event-day");
-                        dayDiv.onclick = () => showModal(events[dateStr]);
-                    } else {
-                        dayDiv.innerText = day;
+                        dayDiv.onclick = () => showModal(dateStr);
                     }
+
+
                     daysDiv.appendChild(dayDiv);
                 }
+
                 monthDiv.appendChild(daysDiv);
                 calendar.appendChild(monthDiv);
             }
         }
 
-        function showModal(content) {
-            document.getElementById("modal-content").innerHTML = `<p>${content}</p><button class='close-btn' onclick='closeModal()'>Закрыть</button>`;
+        function showModal(date) {
+            const eventList = events[date];
+            let content = "";
+            if (eventList && eventList.length > 0) {
+                content = "<ul>";
+                eventList.forEach(event => {
+                    content += `<li>${event}</li>`;
+                });
+                content += "</ul>";
+            } else {
+                content = "<p>No events for this day.</p>";
+            }
+
+            document.getElementById("modal-content").innerHTML = `${content}<button class='close-btn' onclick='closeModal()'>Закрыть</button>`;
             document.getElementById("modal").style.display = "flex";
         }
+
 
         function closeModal() {
             document.getElementById("modal").style.display = "none";
