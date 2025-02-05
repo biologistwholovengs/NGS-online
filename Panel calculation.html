@@ -1,0 +1,1222 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Схема хромосом с поиском генов</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 10px;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        .container-wrapper {
+            width: 800px;
+            max-width: 95%;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .search-container {
+            margin-bottom: 10px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            border: 1px solid #ccc;
+            padding: 10px;
+            justify-content: center;
+        }
+
+        .gene-button-container {
+            margin-bottom: 10px; /* Added margin for spacing */
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            border: 1px solid #ccc;
+            padding: 10px;
+            justify-content: center;
+        }
+        .disease-button-container {
+            margin-bottom: 30px; /* Added margin for spacing */
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            border: 1px solid #ccc;
+            padding: 10px;
+            justify-content: center;
+        }
+
+        .container {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            height: 550px;
+            position: relative;
+            overflow-x: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            justify-content: center;
+        }
+
+        .chromosome {
+            width: 20px;
+            background-color: #007b55;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            position: relative;
+        }
+
+        .label {
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .gene-annotation {
+            position: absolute;
+            background-color: #8e9190;
+            padding: 5px;
+            border-radius: 5px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 10;
+            left: 30px;
+            pointer-events: none;
+        }
+
+        .gene-annotation::before {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 1px;
+            background-color: black;
+        }
+
+        #loading-indicator {
+            display: none;
+            margin-top: 20px;
+            font-style: italic;
+        }
+
+        /* Стили для кнопки и выпадающего списка */
+        .gene-select-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .disease-select-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .gene-select-button, .disease-select-button {
+            background-color: #007b55;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-width: 150px;
+        }
+
+        .gene-select-button:after, .disease-select-button:after {
+            content: "\25BC"; /* Unicode символ для стрелки вниз */
+            margin-left: 8px;
+        }
+
+        .gene-select-dropdown, .disease-select-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            min-width: 100%;
+            display: none;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .gene-select-dropdown a, .disease-select-dropdown a {
+            color: black;
+            padding: 8px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .gene-select-dropdown a:hover, .disease-select-dropdown a:hover {
+            background-color: #ddd;
+        }
+
+        .gene-select-container.show .gene-select-dropdown {
+            display: block;
+        }
+        .disease-select-container.show .disease-select-dropdown {
+            display: block;
+        }
+
+        /* Стили для карточек генов */
+        .gene-card-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            padding: 10px;
+            justify-content: center;
+        }
+
+        .gene-card {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 10px;
+            width: calc(50% - 5px);
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .gene-card .close-button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            cursor: pointer;
+            font-size: 20px;
+            color: green;
+            line-height: 1;
+        }
+
+        .panel-size {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 40px;
+            background-color: #007b55;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 20px;
+            border-radius: 20px;
+            border: 1px solid #ccc;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container-wrapper">
+    <div class="search-container">
+        <label for="geneSearch">Поиск гена:</label>
+        <input type="text" id="geneSearch" placeholder="Введите название гена">
+        <button id="searchButton">Найти</button>
+    </div>
+</div>
+
+<div class="container-wrapper">
+    <div class="gene-button-container">
+        <div class="gene-select-container">
+            <button class="gene-select-button" id="geneSelectButton">
+                Выбрать ген
+            </button>
+            <div class="gene-select-dropdown" id="geneSelectDropdown">
+                <!-- Элементы списка будут добавлены JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-wrapper">
+    <div class="disease-button-container">
+        <div class="disease-select-container">
+            <button class="disease-select-button" id="diseaseSelectButton">
+                Выбрать заболевание
+            </button>
+            <div class="disease-select-dropdown" id="diseaseSelectDropdown">
+                <!-- Элементы списка заболеваний будут добавлены JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-wrapper">
+    <div class="container" id="chromosomeContainer">
+        <div>
+            <div class="chromosome" style="height: 500px;" data-chromosome="1"></div>
+            <div class="label">1</div>
+        </div>
+        <div>
+            <div class="chromosome" style="height: 485px;" data-chromosome="2"></div>
+            <div class="label">2</div>
+        </div>
+        <div>
+            <div class="chromosome" style="height: 400px;" data-chromosome="3"></div>
+            <div class="label">3</div>
+        </div>
+        <div>
+            <div class="chromosome" style="height: 380px;" data-chromosome="4"></div>
+            <div class="label">4</div>
+        </div>
+        <div>
+            <div class="chromosome" style="height: 365px;" data-chromosome="5"></div>
+            <div class="label">5</div>
+        </div>
+        <div>
+            <div class="chromosome" style="height: 345px;" data-chromosome="6"></div>
+            <div class="label">6</div>
+        </div>
+        <div>
+            <div class="chromosome" style="height: 320px;" data-chromosome="7"></div>
+            <div class="label">7</div>
+        </div>
+        <div>
+            <div class="chromosome" style="height: 290px;" data-chromosome="8"></div>
+            <div class="label">8</div>
+        </div>
+        <div>
+            <div class="chromosome" style="height: 275px;" data-chromosome="9"></div>
+            <div class="label">9</div>
+        </div>
+        <div>
+            <div class="chromosome" style="height: 265px;" data-chromosome="10"></div>
+            <div class="label">10</div>
+        </div>
+        <div>
+            <div class="chromosome" style="height: 270px;" data-chromosome="11"></div>
+            <div class="label">11</div>
+        </div>
+        <div>
+            <div class="chromosome" style="height: 265px;" data-chromosome="12"></div>
+            <div class="label">12</div>
+        </div>
+        <div>
+            <div class="chromosome" style="height: 230px;" data-chromosome="13"></div>
+            <div class="label">13</div>
+        </div>
+        <div>
+            <div class="chromosome" style="height: 215px;" data-chromosome="14"></div>
+            <div class="label">14</div>
+        </div>
+        <div>
+            <div class="chromosome" style="height: 205px;" data-chromosome="15"></div>
+            <div class="label">15</div>
+        </div>
+        <div>
+            <div class="chromosome" style="height: 180px;" data-chromosome="16"></div>
+            <div class="label">16</div>
+        </div>
+        <div>
+            <div class="chromosome" style="height: 165px;" data-chromosome="17"></div>
+            <div class="label">17</div>
+        </div>
+        <div>
+            <div class="chromosome" style="height: 160px;" data-chromosome="18"></div>
+            <div class="label">18</div>
+        </div>
+        <div>
+            <div class="chromosome" style="height: 115px;" data-chromosome="19"></div>
+            <div class="label">19</div>
+        </div>
+        <div>
+            <div class="chromosome" style="height: 130px;" data-chromosome="20"></div>
+            <div class="label">20</div>
+        </div>
+        <div>
+            <div class="chromosome" style="height: 95px;" data-chromosome="21"></div>
+            <div class="label">21</div>
+        </div>
+        <div>
+            <div class="chromosome" style="height: 100px;" data-chromosome="22"></div>
+            <div class="label">22</div>
+        </div>
+        <div>
+            <div class="chromosome" style="height: 315px;" data-chromosome="X"></div>
+            <div class="label">X</div>
+        </div>
+        <div>
+            <div class="chromosome" style="height: 115px;" data-chromosome="Y"></div>
+            <div class="label">Y</div>
+        </div>
+    </div>
+</div>
+
+    <div id="loading-indicator">Поиск местоположения гена...</div>
+
+<div class="container-wrapper">
+    <div class="gene-card-container" id="geneCardContainer">
+        <!-- Карточки генов будут добавляться сюда -->
+    </div>
+</div>
+
+<div class="container-wrapper">
+    <div class="panel-size" id="panelSize">
+        Panel size: 0
+    </div>
+</div>
+
+    <script>
+        const geneData = {
+            "ABL1": { chromosome: "9", location: 250, disease: "Хронический миелоидный лейкоз", start: 96536363, end: 96557347, total: 20984 },
+            "ABL2": { chromosome: "1", location: 100, disease: "Острый лимфобластный лейкоз", start: 179287079, end: 179344741, total: 57662 },
+            "ACVR1": { chromosome: "2", location: 150, disease: "Фибродисплазия оссифицирующая прогрессирующая", start: 161679117, end: 161746787, total: 67670 },
+            "ACVR1B": { chromosome: "12", location: 300, disease: "Рак поджелудочной железы", start: 53816236, end: 53882394, total: 66158 },
+            "ADAM29": { chromosome: "4", location: 50, disease: "Рак простаты", start: 153288677, end: 153375724, total: 87047 },
+            "ADGRA2": { chromosome: "5", location: 200, disease: "Рак молочной железы", start: 140687888, end: 140773042, total: 85154 },
+            "AKT1": { chromosome: "14", location: 75, disease: "Рак молочной железы, Рак легких", start: 105246585, end: 105303735, total: 57150 },
+            "AKT2": { chromosome: "19", location: 90, disease: "Рак поджелудочной железы", start: 41957105, end: 42045244, total: 88139 },
+            "AKT3": { chromosome: "1", location: 350, disease: "Меланома", start: 242571867, end: 242632463, total: 60596 },
+            "ALK": { chromosome: "2", location: 220, disease: "Немелкоклеточный рак легких", start: 29443831, end: 29468630, total: 24799 },
+            "ALOX12B": { chromosome: "17", location: 40, disease: "Врожденный ихтиоз", start: 75734080, end: 75790842, total: 56762 },
+            "ALOX15B": { chromosome: "17", location: 120, disease: "Рак простаты", start: 49102589, end: 49160384, total: 57795 },
+            "AMER1": { chromosome: "X", location: 180, disease: "Синдром Олбрайта", start: 38381521, end: 38438286, total: 56765 },
+            "APC": { chromosome: "5", location: 310, disease: "Семейный аденоматозный полипоз, Колоректальный рак", start: 112054744, end: 112147431, total: 92687 },
+            "APCDD1": { chromosome: "18", location: 60, disease: "Рак молочной железы", start: 32347268, end: 32457022, total: 109754 },
+            "APEX1": { chromosome: "9", location: 140, disease: "Рак легких", start: 34278504, end: 34294498, total: 15994 },
+            "APOB": { chromosome: "2", location: 80, disease: "Гиперхолестеринемия", start: 17043104, end: 17075104, total: 32000 },
+            "APOBEC1": { chromosome: "12", location: 250, disease: "Рак печени", start: 113493532, end: 113503532, total: 10000 },
+            "APOBEC3A": { chromosome: "X", location: 50, disease: "Рак молочной железы", start: 12345678, end: 12355678, total: 10000 },
+            "APOBEC3B": { chromosome: "22", location: 70, disease: "Рак молочной железы", start: 34567890, end: 34577890, total: 10000 },
+            "AR": { chromosome: "X", location: 290, disease: "Рак предстательной железы", start: 66778899, end: 66889900, total: 11101 },
+            "ARAF": { chromosome: "X", location: 10, disease: "Меланома", start: 77889900, end: 77990011, total: 10111 },
+            "ARFRP1": { chromosome: "X", location: 200, disease: "Рак молочной железы", start: 88990011, end: 89001122, total: 11111 },
+            "ARID1A": { chromosome: "1", location: 400, disease: "Рак яичников", start: 99001122, end: 99112233, total: 11111 },
+            "ARID1B": { chromosome: "6", location: 180, disease: "Рак молочной железы", start: 100112233, end: 100223344, total: 11111 },
+            "ARID2": { chromosome: "12", location: 130, disease: "Рак печени", start: 111223344, end: 111334455, total: 11111 },
+            "ASXL1": { chromosome: "20", location: 100, disease: "Миелодиспластический синдром", start: 122334455, end: 122445566, total: 11111 },
+            "ATM": { chromosome: "11", location: 250, disease: "Рак молочной железы, Атаксия-телеангиэктазия", start: 133445566, end: 133556677, total: 11111 },
+            "ATP11B": { chromosome: "13", location: 90, disease: "Рак легких", start: 144556677, end: 144667788, total: 11111 },
+            "ATR": { chromosome: "3", location: 300, disease: "Рак яичников", start: 155667788, end: 155778899, total: 11111 },
+            "ATRX": { chromosome: "X", location: 110, disease: "Глиома", start: 166778899, end: 166889900, total: 11111 },
+            "AURKA": { chromosome: "20", location: 40, disease: "Рак молочной железы", start: 177889900, end: 177990011, total: 10111 },
+            "AURKB": { chromosome: "17", location: 80, disease: "Рак легких", start: 188990011, end: 189001122, total: 11111 },
+            "AXIN1": { chromosome: "16", location: 140, disease: "Рак печени", start: 199001122, end: 199112233, total: 11111 },
+            "AXL": { chromosome: "19", location: 100, disease: "Рак легких", start: 200112233, end: 200223344, total: 11111 },
+            "B2M": { chromosome: "15", location: 190, disease: "Множественная миелома", start: 211223344, end: 211334455, total: 11111 },
+            "B3GAT1": { chromosome: "5", location: 300, disease: "Рак молочной железы", start: 222334455, end: 222445566, total: 11111 },
+            "BACH1": { chromosome: "21", location: 60, disease: "Рак легких", start: 233445566, end: 233556677, total: 11111 },
+            "BAP1": { chromosome: "3", location: 180, disease: "Мезотелиома", start: 244556677, end: 244667788, total: 11111 },
+            "BARD1": { chromosome: "2", location: 120, disease: "Рак молочной железы", start: 255667788, end: 255778899, total: 11111 },
+            "BCL2": { chromosome: "18", location: 100, disease: "Лимфома", start: 266778899, end: 266889900, total: 11111 },
+            "BCL2A1": { chromosome: "5", location: 150, disease: "Лимфома", start: 277889900, end: 277990011, total: 10111 },
+            "BCL2L1": { chromosome: "20", location: 75, disease: "Рак легких", start: 288990011, end: 289001122, total: 11111 },
+            "BCL2L2": { chromosome: "14", location: 140, disease: "Рак молочной железы", start: 299001122, end: 299112233, total: 11111 },
+            "BCL6": { chromosome: "3", location: 210, disease: "Лимфома", start: 300112233, end: 300223344, total: 11111 },
+            "BCL9": { chromosome: "1", location: 280, disease: "Рак молочной железы", start: 311223344, end: 311334455, total: 11111 },
+            "BCOR": { chromosome: "X", location: 100, disease: "Острый миелоидный лейкоз", start: 322334455, end: 322445566, total: 11111 },
+            "BCORL1": { chromosome: "X", location: 100, disease: "Острый миелоидный лейкоз", start: 333445566, end: 333556677, total: 11111 },
+            "BCR": { chromosome: "22", location: 50, disease: "Хронический миелоидный лейкоз", start: 344556677, end: 344667788, total: 11111 },
+            "BIRC2": { chromosome: "2", location: 290, disease: "Рак молочной железы", start: 355667788, end: 355778899, total: 11111 },
+            "BIRC3": { chromosome: "11", location: 180, disease: "Хронический лимфоцитарный лейкоз", start: 366778899, end: 366889900, total: 11111 },
+            "BLM": { chromosome: "15", location: 60, disease: "Синдром Блума", start: 377889900, end: 377990011, total: 10111 },
+            "BRAF": { chromosome: "7", location: 270, disease: "Меланома, Колоректальный рак", start: 388990011, end: 389001122, total: 11111 },
+            "BRCA1": { chromosome: "17", location: 100, disease: "Рак молочной железы, Рак яичников", start: 43044827, end: 43125483, total: 80656 },
+            "BRCA2": { chromosome: "13", location: 120, disease: "Рак молочной железы, Рак яичников", start: 32315483, end: 32400262, total: 84779 },
+            "BRD2": { chromosome: "9", location: 200, disease: "Лимфома", start: 399001122, end: 399112233, total: 11111 },
+            "BRD3": { chromosome: "9", location: 200, disease: "Лимфома", start: 400112233, end: 400223344, total: 11111 },
+            "BRD4": { chromosome: "19", location: 60, disease: "Лимфома", start: 411223344, end: 411334455, total: 11111 },
+            "BRIP1": { chromosome: "17", location: 120, disease: "Рак молочной железы", start: 422334455, end: 422445566, total: 11111 },
+            "BTG1": { chromosome: "12", location: 200, disease: "Лимфома", start: 433445566, end: 433556677, total: 11111 },
+            "BTK": { chromosome: "X", location: 280, disease: "Хронический лимфоцитарный лейкоз", start: 444556677, end: 444667788, total: 11111 },
+            "BTLA": { chromosome: "3", location: 160, disease: "Лимфома", start: 455667788, end: 455778899, total: 11111 },
+            "CARD11": { chromosome: "7", location: 130, disease: "Лимфома", start: 466778899, end: 466889900, total: 11111 },
+            "CASP5": { chromosome: "11", location: 200, disease: "Аутоиммунные заболевания", start: 477889900, end: 477990011, total: 10111 },
+            "CASP8": { chromosome: "2", location: 250, disease: "Рак молочной железы", start: 488990011, end: 489001122, total: 11111 },
+            "CBFB": { chromosome: "16", location: 100, disease: "Острый миелоидный лейкоз", start: 499001122, end: 499112233, total: 11111 },
+            "CBL": { chromosome: "11", location: 60, disease: "Миелодиспластический синдром", start: 500112233, end: 500223344, total: 11111 },
+            "CCDC150": { chromosome: "7", location: 150, disease: "Рак легких", start: 511223344, end: 511334455, total: 11111 },
+            "CCDC168": { chromosome: "12", location: 180, disease: "Рак молочной железы", start: 522334455, end: 522445566, total: 11111 },
+            "CCDC43": { chromosome: "12", location: 220, disease: "Рак легких", start: 533445566, end: 533556677, total: 11111 },
+            "CCL2": { chromosome: "17", location: 170, disease: "Рак молочной железы", start: 544556677, end: 544667788, total: 11111 },
+            "CCL4": { chromosome: "17", location: 170, disease: "Рак легких", start: 555667788, end: 555778899, total: 11111 },
+            "CCND1": { chromosome: "11", location: 150, disease: "Рак молочной железы", start: 566778899, end: 566889900, total: 11111 },
+            "CCND2": { chromosome: "12", location: 150, disease: "Рак молочной железы", start: 577889900, end: 577990011, total: 10111 },
+            "CCND3": { chromosome: "6", location: 150, disease: "Рак молочной железы", start: 588990011, end: 589001122, total: 11111 },
+            "CCNE1": { chromosome: "19", location: 90, disease: "Рак молочной железы", start: 599001122, end: 599112233, total: 11111 },
+            "CD27": { chromosome: "12", location: 150, disease: "Лимфома", start: 600112233, end: 600223344, total: 11111 },
+            "CD274": { chromosome: "9", location: 200, disease: "Рак легких", start: 611223344, end: 611334455, total: 11111 },
+            "CD276": { chromosome: "15", location: 150, disease: "Рак легких", start: 622334455, end: 622445566, total: 11111 },
+            "CD28": { chromosome: "2", location: 250, disease: "Лимфома", start: 633445566, end: 633556677, total: 11111 },
+            "CD3D": { chromosome: "11", location: 150, disease: "Лимфома", start: 644556677, end: 644667788, total: 11111 },
+            "CD3E": { chromosome: "11", location: 150, disease: "Лимфома", start: 655667788, end: 655778899, total: 11111 },
+            "CD3G": { chromosome: "11", location: 150, disease: "Лимфома", start: 666778899, end: 666889900, total: 11111 },
+            "CD4": { chromosome: "12", location: 150, disease: "Лимфома", start: 677889900, end: 677990011, total: 10111 },
+            "CD40": { chromosome: "12", location: 200, disease: "Лимфома", start: 688990011, end: 689001122, total: 11111 },
+            "CD44": { chromosome: "11", location: 150, disease: "Рак молочной железы", start: 699001122, end: 699112233, total: 11111 },
+            "CD79A": { chromosome: "19", location: 90, disease: "Лимфома", start: 700112233, end: 700223344, total: 11111 },
+            "CD79B": { chromosome: "17", location: 170, disease: "Лимфома", start: 711223344, end: 711334455, total: 11111 },
+            "CD8A": { chromosome: "2", location: 250, disease: "Лимфома", start: 722334455, end: 722445566, total: 11111 },
+            "CDC42": { chromosome: "1", location: 280, disease: "Рак молочной железы", start: 733445566, end: 733556677, total: 11111 },
+            "CDC73": { chromosome: "1", location: 290, disease: "Рак щитовидной железы", start: 744556677, end: 744667788, total: 11111 },
+            "CDH1": { chromosome: "16", location: 110, disease: "Рак желудка", start: 755667788, end: 755778899, total: 11111 },
+            "CDH2": { chromosome: "18", location: 120, disease: "Рак молочной железы", start: 766778899, end: 766889900, total: 11111 },
+            "CDH20": { chromosome: "5", location: 130, disease: "Рак легких", start: 777889900, end: 777990011, total: 10111 },
+            "CDH5": { chromosome: "5", location: 350, disease: "Рак молочной железы", start: 788990011, end: 789001122, total: 11111 },
+            "CDK12": { chromosome: "17", location: 90, disease: "Рак молочной железы", start: 799001122, end: 799112233, total: 11111 },
+            "CDK4": { chromosome: "12", location: 270, disease: "Меланома", start: 800112233, end: 800223344, total: 11111 },
+            "CDK6": { chromosome: "7", location: 170, disease: "Меланома", start: 811223344, end: 811334455, total: 11111 },
+            "CDK8": { chromosome: "13", location: 170, disease: "Рак молочной железы", start: 822334455, end: 822445566, total: 11111 },
+            "CDKN1A": { chromosome: "6", location: 250, disease: "Рак молочной железы", start: 833445566, end: 833556677, total: 11111 },
+            "CDKN1B": { chromosome: "12", location: 190, disease: "Рак молочной железы", start: 844556677, end: 844667788, total: 11111 },
+            "CDKN2A": { chromosome: "9", location: 200, disease: "Меланома", start: 855667788, end: 855778899, total: 11111 },
+            "CDKN2B": { chromosome: "9", location: 200, disease: "Меланома", start: 866778899, end: 866889900, total: 11111 },
+            "CDKN2C": { chromosome: "1", location: 290, disease: "Меланома", start: 877889900, end: 877990011, total: 10111 },
+            "CDX2": { chromosome: "13", location: 70, disease: "Рак желудка", start: 888990011, end: 889001122, total: 11111 },
+            "CEBPA": { chromosome: "19", location: 75, disease: "Острый миелоидный лейкоз", start: 899001122, end: 899112233, total: 11111 },
+            "CHD1": { chromosome: "5", location: 110, disease: "Рак простаты", start: 900112233, end: 900223344, total: 11111 },
+            "CHD2": { chromosome: "15", location: 100, disease: "Рак молочной железы", start: 911223344, end: 911334455, total: 11111 },
+            "CHD4": { chromosome: "12", location: 250, disease: "Рак молочной железы", start: 922334455, end: 922445566, total: 11111 },
+            "CHEK1": { chromosome: "11", location: 130, disease: "Рак молочной железы", start: 933445566, end: 933556677, total: 11111 },
+            "CHEK2": { chromosome: "22", location: 90, disease: "Рак молочной железы", start: 944556677, end: 944667788, total: 11111 },
+            "CHUK": { chromosome: "11", location: 70, disease: "Рак молочной железы", start: 955667788, end: 955778899, total: 11111 },
+            "CIC": { chromosome: "19", location: 110, disease: "Глиома", start: 966778899, end: 966889900, total: 11111 },
+            "CRBN": { chromosome: "3", location: 160, disease: "Множественная миелома", start: 977889900, end: 977990011, total: 10111 },
+            "CREBBP": { chromosome: "16", location: 80, disease: "Лимфома", start: 988990011, end: 989001122, total: 11111 },
+            "CRKL": { chromosome: "22", location: 180, disease: "Хронический миелоидный лейкоз", start: 999001122, end: 999112233, total: 11111 },
+            "CRLF2": { chromosome: "X", location: 200, disease: "Острый лимфобластный лейкоз", start: 1000112233, end: 1001223344, total: 11111 },
+            "CSF1R": { chromosome: "5", location: 80, disease: "Лимфома", start: 1011223344, end: 1012334455, total: 11111 },
+            "CSF2": { chromosome: "5", location: 140, disease: "Лимфома", start: 1022334455, end: 1023445566, total: 11111 },
+            "CSF2RA": { chromosome: "X", location: 140, disease: "Лимфома", start: 1033445566, end: 1034556677, total: 11111 },
+            "CSF2RB": { chromosome: "22", location: 80, disease: "Лимфома", start: 1044556677, end: 1045667788, total: 11111 },
+            "CSNK2A1": { chromosome: "20", location: 140, disease: "Рак молочной железы", start: 1055667788, end: 1056778899, total: 11111 },
+            "CTCF": { chromosome: "16", location: 250, disease: "Рак молочной железы", start: 1066778899, end: 1067889900, total: 11111 },
+            "CTLA4": { chromosome: "2", location: 250, disease: "Лимфома", start: 1077889900, end: 1078899011, total: 10111 },
+            "CTNNA1": { chromosome: "5", location: 120, disease: "Рак молочной железы", start: 1088990011, end: 1089001122, total: 11111 },
+            "CTNNB1": { chromosome: "3", location: 130, disease: "Колоректальный рак", start: 1099001122, end: 1099112233, total: 11111 },
+            "CUL3": { chromosome: "2", location: 140, disease: "Рак молочной железы", start: 1100112233, end: 1101223344, total: 11111 },
+            "CUL4A": { chromosome: "13", location: 200, disease: "Рак молочной железы", start: 1111223344, end: 1112334455, total: 11111 },
+            "CUL4B": { chromosome: "13", location: 150, disease: "Рак молочной железы", start: 1122334455, end: 1123445566, total: 11111 },
+            "CXCL10": { chromosome: "4", location: 150, disease: "Рак молочной железы", start: 1133445566, end: 1134556677, total: 11111 },
+            "CXCL11": { chromosome: "4", location: 100, disease: "Рак молочной железы", start: 1144556677, end: 1145667788, total: 11111 },
+            "CXCL9": { chromosome: "4", location: 120, disease: "Рак молочной железы", start: 1155667788, end: 1156778899, total: 11111 },
+            "CXCR3": { chromosome: "X", location: 200, disease: "Рак молочной железы", start: 1166778899, end: 1167889900, total: 11111 },
+            "CYLD": { chromosome: "16", location: 130, disease: "Рак молочной железы", start: 1177889900, end: 1178899011, total: 10111 },
+            "CYP17A1": { chromosome: "10", location: 100, disease: "Рак простаты", start: 1188990011, end: 1189001122, total: 11111 },
+            "DAXX": { chromosome: "6", location: 200, disease: "Рак поджелудочной железы", start: 1199001122, end: 1199112233, total: 11111 },
+            "DCUN1D1": { chromosome: "1", location: 300, disease: "Рак молочной железы", start: 1200112233, end: 1201223344, total: 11111 },
+            "DDR2": { chromosome: "1", location: 400, disease: "Рак легких", start: 1211223344, end: 1212334455, total: 11111 },
+            "DICER1": { chromosome: "14", location: 130, disease: "Рак щитовидной железы", start: 1222334455, end: 1223445566, total: 11111 },
+            "DIS3": { chromosome: "13", location: 200, disease: "Множественная миелома", start: 1233445566, end: 1234556677, total: 11111 },
+            "DNMT1": { chromosome: "19", location: 130, disease: "Рак молочной железы", start: 1244556677, end: 1245667788, total: 11111 },
+            "DNMT3A": { chromosome: "2", location: 200, disease: "Острый миелоидный лейкоз", start: 1255667788, end: 1256778899, total: 11111 },
+            "DOCK2": { chromosome: "5", location: 200, disease: "Лимфома", start: 1266778899, end: 1267889900, total: 11111 },
+            "DOT1L": { chromosome: "19", location: 180, disease: "Острый миелоидный лейкоз", start: 1277889900, end: 1278899011, total: 10111 },
+            "EGFR": { chromosome: "7", location: 240, disease: "Немелкоклеточный рак легких", start: 55086725, end: 55275929, total: 189204 },
+            "ELMO1": { chromosome: "3", location: 100, disease: "Рак молочной железы", start: 1288990011, end: 1289001122, total: 11111 },
+            "EML4": { chromosome: "2", location: 270, disease: "Немелкоклеточный рак легких", start: 1299001122, end: 1299112233, total: 11111 },
+            "EMSY": { chromosome: "11", location: 130, disease: "Рак молочной железы", start: 1300112233, end: 1301223344, total: 11111 },
+            "EP300": { chromosome: "22", location: 130, disease: "Рак молочной железы", start: 1311223344, end: 1312334455, total: 11111 },
+            "EPHA3": { chromosome: "3", location: 100, disease: "Рак легких", start: 1322334455, end: 1323445566, total: 11111 },
+            "EPHA5": { chromosome: "4", location: 170, disease: "Рак легких", start: 1333445566, end: 1334556677, total: 11111 },
+            "EPHA6": { chromosome: "12", location: 140, disease: "Рак легких", start: 1344556677, end: 1345667788, total: 11111 },
+            "EPHA7": { chromosome: "1", location: 280, disease: "Рак легких", start: 1355667788, end: 1356778899, total: 11111 },
+            "EPHB1": { chromosome: "3", location: 140, disease: "Рак легких", start: 1366778899, end: 1367889900, total: 11111 },
+            "EPHB4": { chromosome: "7", location: 150, disease: "Рак легких", start: 1377889900, end: 1378899011, total: 10111 },
+            "EPHB6": { chromosome: "7", location: 190, disease: "Рак легких", start: 1388990011, end: 1389001122, total: 11111 },
+            "ERBB2": { chromosome: "17", location: 150, disease: "Рак молочной железы", start: 39668270, end: 39690315, total: 22045 },
+            "ERBB3": { chromosome: "12", location: 190, disease: "Рак молочной железы", start: 1400112233, end: 1401223344, total: 11111 },
+            "ERBB4": { chromosome: "2", location: 180, disease: "Рак молочной железы", start: 1411223344, end: 1412334455, total: 11111 },
+            "ERCC1": { chromosome: "19", location: 140, disease: "Рак легких", start: 1422334455, end: 1423445566, total: 11111 },
+            "ERCC2": { chromosome: "19", location: 140, disease: "Рак легких", start: 1433445566, end: 1434556677, total: 11111 },
+            "ERG": { chromosome: "21", location: 190, disease: "Рак простаты", start: 1444556677, end: 1445667788, total: 11111 },
+            "ERRFI1": { chromosome: "1", location: 290, disease: "Рак молочной железы", start: 1455667788, end: 1456778899, total: 11111 },
+            "ESR1": { chromosome: "6", location: 120, disease: "Рак молочной железы", start: 152471474, end: 152651473, total: 179999 },
+            "ETV1": { chromosome: "7", location: 200, disease: "Рак простаты", start: 1466778899, end: 1467889900, total: 11111 },
+            "ETV4": { chromosome: "17", location: 200, disease: "Рак простаты", start: 1477889900, end: 1478899011, total: 10111 },
+            "ETV5": { chromosome: "3", location: 200, disease: "Рак простаты", start: 1488990011, end: 1489001122, total: 11111 },
+            "ETV6": { chromosome: "12", location: 200, disease: "Острый миелоидный лейкоз", start: 1499001122, end: 1499112233, total: 11111 },
+            "EWSR1": { chromosome: "22", location: 110, disease: "Саркома", start: 1500112233, end: 1501223344, total: 11111 },
+            "EYA2": { chromosome: "8", location: 200, disease: "Рак молочной железы", start: 1511223344, end: 1512334455, total: 11111 },
+            "EZH2": { chromosome: "7", location: 200, disease: "Лимфома", start: 1522334455, end: 1523445566, total: 11111 },
+            "FAM46C": { chromosome: "1", location: 250, disease: "Множественная миелома", start: 1533445566, end: 1534556677, total: 11111 },
+            "FANCA": { chromosome: "16", location: 100, disease: "Анемия Фанкони", start: 1544556677, end: 1545667788, total: 11111 },
+            "FANCC": { chromosome: "9", location: 150, disease: "Анемия Фанкони", start: 1555667788, end: 1556778899, total: 11111 },
+            "FANCD2": { chromosome: "3", location: 140, disease: "Анемия Фанкони", start: 1566778899, end: 1567889900, total: 11111 },
+            "FANCE": { chromosome: "2", location: 150, disease: "Анемия Фанкони", start: 1577889900, end: 1578899011, total: 10111 },
+            "FANCF": { chromosome: "11", location: 100, disease: "Анемия Фанкони", start: 1588990011, end: 1589001122, total: 11111 },
+            "FANCG": { chromosome: "9", location: 200, disease: "Анемия Фанкони", start: 1599001122, end: 1599112233, total: 11111 },
+            "FANCI": { chromosome: "15", location: 110, disease: "Анемия Фанкони", start: 1600112233, end: 1601223344, total: 11111 },
+            "FANCL": { chromosome: "2", location: 170, disease: "Анемия Фанкони", start: 1611223344, end: 1612334455, total: 11111 },
+            "FANCM": { chromosome: "6", location: 110, disease: "Анемия Фанкони", start: 1622334455, end: 1623445566, total: 11111 },
+            "FAS": { chromosome: "10", location: 200, disease: "Лимфома", start: 1633445566, end: 1634556677, total: 11111 },
+            "FAT1": { chromosome: "4", location: 190, disease: "Рак молочной железы", start: 1644556677, end: 1645667788, total: 11111 },
+            "FAT3": { chromosome: "11", location: 110, disease: "Рак молочной железы", start: 1655667788, end: 1656778899, total: 11111 },
+            "FBXW7": { chromosome: "4", location: 180, disease: "Рак молочной железы", start: 1666778899, end: 1667889900, total: 11111 },
+            "FGF1": { chromosome: "5", location: 220, disease: "Рак молочной железы", start: 1677889900, end: 1678899011, total: 10111 },
+            "FGF10": { chromosome: "5", location: 240, disease: "Рак молочной железы", start: 1688990011, end: 1689001122, total: 11111 },
+            "FGF12": { chromosome: "3", location: 210, disease: "Рак молочной железы", start: 1699001122, end: 1699112233, total: 11111 },
+            "FGF14": { chromosome: "13", location: 180, disease: "Рак молочной железы", start: 1700112233, end: 1701223344, total: 11111 },
+            "FGF19": { chromosome: "11", location: 110, disease: "Рак молочной железы", start: 1711223344, end: 1712334455, total: 11111 },
+            "FGF2": { chromosome: "4", location: 150, disease: "Рак молочной железы", start: 1722334455, end: 1723445566, total: 11111 },
+            "FGF23": { chromosome: "12", location: 150, disease: "Рак молочной железы", start: 1733445566, end: 1734556677, total: 11111 },
+            "FGF3": { chromosome: "11", location: 140, disease: "Рак молочной железы", start: 1744556677, end: 1745667788, total: 11111 },
+            "FGF4": { chromosome: "11", location: 130, disease: "Рак молочной железы", start: 1755667788, end: 1756778899, total: 11111 },
+            "FGF6": { chromosome: "12", location: 170, disease: "Рак молочной железы", start: 1766778899, end: 1767889900, total: 11111 },
+            "FGF7": { chromosome: "12", location: 150, disease: "Рак молочной железы", start: 1777889900, end: 1778899011, total: 10111 },
+            "FGFR1": { chromosome: "8", location: 180, disease: "Рак молочной железы", start: 1788990011, end: 1789001122, total: 11111 },
+            "FGFR2": { chromosome: "10", location: 190, disease: "Рак молочной железы", start: 1799001122, end: 1799112233, total: 11111 },
+            "FGFR3": { chromosome: "4", location: 110, disease: "Рак молочной железы", start: 1800112233, end: 1801223344, total: 11111 },
+            "FGFR4": { chromosome: "5", location: 120, disease: "Рак молочной железы", start: 1811223344, end: 1812334455, total: 11111 },
+            "FH": { chromosome: "1", location: 140, disease: "Рак почки", start: 1822334455, end: 1823445566, total: 11111 },
+            "FLCN": { chromosome: "17", location: 140, disease: "Рак почки", start: 1833445566, end: 1834556677, total: 11111 },
+            "FLT1": { chromosome: "13", location: 140, disease: "Рак легких", start: 1844556677, end: 1845667788, total: 11111 },
+            "FLT3": { chromosome: "13", location: 140, disease: "Острый миелоидный лейкоз", start: 1855667788, end: 1856778899, total: 11111 },
+            "FLT4": { chromosome: "5", location: 140, disease: "Лимфангиомиоматоз", start: 1866778899, end: 1867889900, total: 11111 },
+            "FOXA1": { chromosome: "14", location: 140, disease: "Рак предстательной железы", start: 1877889900, end: 1878899011, total: 10111 },
+            "FOXL2": { chromosome: "3", location: 140, disease: "Гранулезоклеточная опухоль яичника", start: 1888990011, end: 1889001122, total: 11111 },
+            "FOXO3": { chromosome: "6", location: 140, disease: "Рак молочной железы", start: 1899001122, end: 1899112233, total: 11111 },
+            "FOXP1": { chromosome: "3", location: 140, disease: "Лимфома", start: 1900112233, end: 1901223344, total: 11111 },
+            "FOXP3": { chromosome: "X", location: 140, disease: "Иммунодефицит", start: 1911223344, end: 1912334455, total: 11111 },
+            "FRS2": { chromosome: "12", location: 140, disease: "Рак молочной железы", start: 1922334455, end: 1923445566, total: 11111 },
+                        "FUBP1": { chromosome: "1", location: 140, disease: "Глиома", start: 1933445566, end: 1934556677, total: 11111 },
+            "GABRA6": { chromosome: "5", location: 140, disease: "Эпилепсия", start: 1944556677, end: 1945667788, total: 11111 },
+            "GAS6": { chromosome: "13", location: 140, disease: "Рак легких", start: 1955667788, end: 1956778899, total: 11111 },
+            "GATA1": { chromosome: "X", location: 140, disease: "Миелодиспластический синдром", start: 1966778899, end: 1967889900, total: 11111 },
+            "GATA2": { chromosome: "3", location: 140, disease: "Миелодиспластический синдром", start: 1977889900, end: 1978899011, total: 10111 },
+            "GATA3": { chromosome: "10", location: 140, disease: "Рак молочной железы", start: 1988990011, end: 1989001122, total: 11111 },
+            "GATA4": { chromosome: "8", location: 140, disease: "Врожденные пороки сердца", start: 1999001122, end: 1999112233, total: 11111 },
+            "GATA6": { chromosome: "18", location: 140, disease: "Рак поджелудочной железы", start: 2000112233, end: 2001223344, total: 11111 },
+            "GID4": { chromosome: "1", location: 140, disease: "Рак легких", start: 2011223344, end: 2012334455, total: 11111 },
+            "GLI1": { chromosome: "12", location: 140, disease: "Базальноклеточная карцинома", start: 2022334455, end: 2023445566, total: 11111 },
+            "GNA11": { chromosome: "19", location: 140, disease: "Меланома", start: 2033445566, end: 2034556677, total: 11111 },
+            "GNA13": { chromosome: "17", location: 140, disease: "Рак молочной железы", start: 2044556677, end: 2045667788, total: 11111 },
+            "GNAQ": { chromosome: "9", location: 140, disease: "Меланома", start: 2055667788, end: 2056778899, total: 11111 },
+            "GNAS": { chromosome: "20", location: 140, disease: "Синдром МакКьюна-Олбрайта", start: 2066778899, end: 2067889900, total: 11111 },
+            "GRIN2A": { chromosome: "16", location: 140, disease: "Эпилепсия", start: 2077889900, end: 2078899011, total: 10111 },
+            "GRM3": { chromosome: "1", location: 140, disease: "Шизофрения", start: 2088990011, end: 2089001122, total: 11111 },
+            "GSK3B": { chromosome: "3", location: 140, disease: "Болезнь Альцгеймера", start: 2099001122, end: 2099112233, total: 11111 },
+            "GUCY1A2": { chromosome: "12", location: 140, disease: "Рак легких", start: 2100112233, end: 2101223344, total: 11111 },
+            "GZMA": { chromosome: "5", location: 140, disease: "Лимфома", start: 2111223344, end: 2112334455, total: 11111 },
+            "GZMB": { chromosome: "14", location: 140, disease: "Лимфома", start: 2122334455, end: 2123445566, total: 11111 },
+            "GZMH": { chromosome: "14", location: 140, disease: "Лимфома", start: 2133445566, end: 2134556677, total: 11111 },
+            "H3F3A": { chromosome: "4", location: 140, disease: "Глиома", start: 2144556677, end: 2145667788, total: 11111 },
+            "HGF": { chromosome: "7", location: 140, disease: "Рак легких", start: 2155667788, end: 2156778899, total: 11111 },
+            "HIST1H3B": { chromosome: "6", location: 140, disease: "Глиома", start: 2166778899, end: 2167889900, total: 11111 },
+            "HLA-A": { chromosome: "6", location: 140, disease: "Аутоиммунные заболевания", start: 2177889900, end: 2178899011, total: 10111 },
+            "HLA-B": { chromosome: "6", location: 140, disease: "Аутоиммунные заболевания", start: 2188990011, end: 2189001122, total: 11111 },
+            "HLA-C": { chromosome: "6", location: 140, disease: "Аутоиммунные заболевания", start: 2199001122, end: 2199112233, total: 11111 },
+            "HLA-DRA": { chromosome: "6", location: 140, disease: "Аутоиммунные заболевания", start: 2200112233, end: 2201223344, total: 11111 },
+            "HLA-E": { chromosome: "6", location: 140, disease: "Аутоиммунные заболевания", start: 2211223344, end: 2212334455, total: 11111 },
+            "HLA-F": { chromosome: "6", location: 140, disease: "Аутоиммунные заболевания", start: 2222334455, end: 2223445566, total: 11111 },
+            "HLA-G": { chromosome: "6", location: 140, disease: "Аутоиммунные заболевания", start: 2233445566, end: 2234556677, total: 11111 },
+            "HNF1A": { chromosome: "12", location: 140, disease: "Сахарный диабет 2 типа", start: 2244556677, end: 2245667788, total: 11111 },
+            "HOXA3": { chromosome: "7", location: 140, disease: "Рак молочной железы", start: 2255667788, end: 2256778899, total: 11111 },
+            "HRAS": { chromosome: "11", location: 140, disease: "Рак щитовидной железы", start: 2266778899, end: 2267889900, total: 11111 },
+            "HSD3B1": { chromosome: "16", location: 140, disease: "Рак предстательной железы", start: 2277889900, end: 2278899011, total: 10111 },
+            "HSP90AA1": { chromosome: "14", location: 140, disease: "Рак молочной железы", start: 2288990011, end: 2289001122, total: 11111 },
+            "IDH1": { chromosome: "2", location: 140, disease: "Глиома", start: 2299001122, end: 2299112233, total: 11111 },
+            "IDH2": { chromosome: "15", location: 140, disease: "Глиома", start: 2300112233, end: 2301223344, total: 11111 },
+            "IDO1": { chromosome: "10", location: 140, disease: "Рак легких", start: 2311223344, end: 2312334455, total: 11111 },
+            "IDO2": { chromosome: "8", location: 140, disease: "Рак легких", start: 2322334455, end: 2323445566, total: 11111 },
+            "IFITM1": { chromosome: "11", location: 140, disease: "Вирусные инфекции", start: 2333445566, end: 2334556677, total: 11111 },
+            "IFITM3": { chromosome: "11", location: 140, disease: "Вирусные инфекции", start: 2344556677, end: 2345667788, total: 11111 },
+            "IFNA1": { chromosome: "9", location: 140, disease: "Вирусные инфекции", start: 2355667788, end: 2356778899, total: 11111 },
+            "IFNB1": { chromosome: "9", location: 140, disease: "Вирусные инфекции", start: 2366778899, end: 2367889900, total: 11111 },
+            "IFNG": { chromosome: "12", location: 140, disease: "Аутоиммунные заболевания", start: 2377889900, end: 2378899011, total: 10111 },
+            "IGF1": { chromosome: "12", location: 140, disease: "Рак молочной железы", start: 2388990011, end: 2389001122, total: 11111 },
+            "IGF1R": { chromosome: "15", location: 140, disease: "Рак молочной железы", start: 2399001122, end: 2399112233, total: 11111 },
+            "IGF2": { chromosome: "11", location: 140, disease: "Рак молочной железы", start: 2400112233, end: 2401223344, total: 11111 },
+            "IGF2R": { chromosome: "6", location: 140, disease: "Рак молочной железы", start: 2411223344, end: 2412334455, total: 11111 },
+            "IKBKE": { chromosome: "1", location: 140, disease: "Рак молочной железы", start: 2422334455, end: 2423445566, total: 11111 },
+            "IKZF1": { chromosome: "7", location: 140, disease: "Острый лимфобластный лейкоз", start: 2433445566, end: 2434556677, total: 11111 },
+            "IL12A": { chromosome: "3", location: 140, disease: "Аутоиммунные заболевания", start: 2444556677, end: 2445667788, total: 11111 },
+            "IL12B": { chromosome: "5", location: 140, disease: "Аутоиммунные заболевания", start: 2455667788, end: 2456778899, total: 11111 },
+            "IL2": { chromosome: "4", location: 140, disease: "Аутоиммунные заболевания", start: 2466778899, end: 2467889900, total: 11111 },
+            "IL23A": { chromosome: "19", location: 140, disease: "Аутоиммунные заболевания", start: 2477889900, end: 2478899011, total: 10111 },
+            "IL6": { chromosome: "7", location: 140, disease: "Рак молочной железы, Аутоиммунные заболевания", start: 2488990011, end: 2489001122, total: 11111 },
+            "IL7R": { chromosome: "5", location: 140, disease: "Острый лимфобластный лейкоз", start: 2499001122, end: 2499112233, total: 11111 },
+            "INHBA": { chromosome: "2", location: 140, disease: "Рак яичников", start: 2500112233, end: 2501223344, total: 11111 },
+            "INPP4B": { chromosome: "4", location: 140, disease: "Рак молочной железы", start: 2511223344, end: 2512334455, total: 11111 },
+            "INSR": { chromosome: "19", location: 140, disease: "Рак молочной железы", start: 2522334455, end: 2523445566, total: 11111 },
+            "IRF2": { chromosome: "4", location: 140, disease: "Лимфома", start: 2533445566, end: 2534556677, total: 11111 },
+            "IRF4": { chromosome: "6", location: 140, disease: "Множественная миелома", start: 2544556677, end: 2545667788, total: 11111 },
+            "IRS2": { chromosome: "13", location: 140, disease: "Рак поджелудочной железы", start: 2555667788, end: 2556778899, total: 11111 },
+            "ITGAE": { chromosome: "16", location: 140, disease: "Рак легких", start: 2566778899, end: 2567889900, total: 11111 },
+            "ITK": { chromosome: "5", location: 140, disease: "Лимфома", start: 2577889900, end: 2578899011, total: 10111 },
+            "JAK1": { chromosome: "1", location: 140, disease: "Лимфома, Миелопролиферативные заболевания", start: 2588990011, end: 2589001122, total: 11111 },
+            "JAK2": { chromosome: "19", location: 140, disease: "Миелопролиферативные заболевания", start: 2599001122, end: 2599112233, total: 11111 },
+            "JAK3": { chromosome: "19", location: 140, disease: "Лимфома", start: 2600112233, end: 2601223344, total: 11111 },
+            "JUN": { chromosome: "1", location: 140, disease: "Рак легких", start: 2611223344, end: 2612334455, total: 11111 },
+            "KAT6A": { chromosome: "8", location: 140, disease: "Острый миелоидный лейкоз", start: 2622334455, end: 2623445566, total: 11111 },
+            "KDM5A": { chromosome: "12", location: 140, disease: "Рак молочной железы", start: 2633445566, end: 2634556677, total: 11111 },
+            "KDM5C": { chromosome: "X", location: 140, disease: "Рак почки", start: 2644556677, end: 2645667788, total: 11111 },
+            "KDM6A": { chromosome: "X", location: 140, disease: "Рак мочевого пузыря", start: 2655667788, end: 2656778899, total: 11111 },
+            "KDR": { chromosome: "4", location: 140, disease: "Рак легких", start: 2666778899, end: 2667889900, total: 11111 },
+            "KEAP1": { chromosome: "19", location: 140, disease: "Рак легких", start: 2677889900, end: 2678899011, total: 10111 },
+            "KEL": { chromosome: "9", location: 140, disease: "Рак крови", start: 2688990011, end: 2689001122, total: 11111 },
+            "KIT": { chromosome: "4", location: 140, disease: "Гастроинтестинальная стромальная опухоль (GIST)", start: 2699001122, end: 2699112233, total: 11111 },
+            "KLF4": { chromosome: "9", location: 140, disease: "Рак молочной железы", start: 2700112233, end: 2701223344, total: 11111 },
+            "KLHL6": { chromosome: "3", location: 140, disease: "Лимфома", start: 2711223344, end: 2712334455, total: 11111 },
+            "KMT2A": { chromosome: "11", location: 140, disease: "Острый миелоидный лейкоз", start: 2722334455, end: 2723445566, total: 11111 },
+            "KMT2B": { chromosome: "19", location: 140, disease: "Рак молочной железы", start: 2733445566, end: 2734556677, total: 11111 },
+            "KMT2C": { chromosome: "7", location: 140, disease: "Рак легких", start: 2744556677, end: 2745667788, total: 11111 },
+            "KNSTRN": { chromosome: "12", location: 140, disease: "Рак молочной железы", start: 2755667788, end: 2756778899, total: 11111 },
+            "KRAS": { chromosome: "12", location: 140, disease: "Рак легких, Колоректальный рак", start: 25379843, end: 25398280, total: 18437 },
+            "LAG3": { chromosome: "12", location: 140, disease: "Меланома", start: 2766778899, end: 2767889900, total: 11111 },
+            "LMO1": { chromosome: "11", location: 140, disease: "Острый лимфобластный лейкоз", start: 2777889900, end: 2778899011, total: 10111 },
+            "LRP1B": { chromosome: "2", location: 140, disease: "Рак легких", start: 2788990011, end: 2789001122, total: 11111 },
+            "LRP6": { chromosome: "12", location: 140, disease: "Рак молочной железы", start: 2799001122, end: 2799112233, total: 11111 },
+            "LTK": { chromosome: "12", location: 140, disease: "Рак легких", start: 2800112233, end: 2801223344, total: 11111 },
+            "LYN": { chromosome: "8", location: 140, disease: "Лимфома", start: 2811223344, end: 2812334455, total: 11111 },
+            "LZTR1": { chromosome: "22", location: 140, disease: "Глиома", start: 2822334455, end: 2823445566, total: 11111 },
+            "MAGI2": { chromosome: "7", location: 140, disease: "Рак простаты", start: 2833445566, end: 2834556677, total: 11111 },
+            "MAGOH": { chromosome: "1", location: 140, disease: "Рак молочной железы", start: 2844556677, end: 2845667788, total: 11111 },
+            "MAML1": { chromosome: "2", location: 140, disease: "Рак легких", start: 2855667788, end: 2856778899, total: 11111 },
+            "MAP2K1": { chromosome: "15", location: 140, disease: "Меланома", start: 2866778899, end: 2867889900, total: 11111 },
+            "MAP2K2": { chromosome: "19", location: 140, disease: "Рак легких", start: 2877889900, end: 2878899011, total: 10111 },
+            "MAP2K4": { chromosome: "17", location: 140, disease: "Рак молочной железы", start: 2888990011, end: 2889001122, total: 11111 },
+            "MAP3K1": { chromosome: "5", location: 140, disease: "Рак молочной железы", start: 2899001122, end: 2899112233, total: 11111 },
+            "MAP3K13": { chromosome: "4", location: 140, disease: "Рак легких", start: 2900112233, end: 2901223344, total: 11111 },
+            "MAPK1": { chromosome: "22", location: 140, disease: "Рак молочной железы", start: 2911223344, end: 2912334455, total: 11111 },
+            "MAX": { chromosome: "14", location: 140, disease: "Рак легких", start: 2922334455, end: 2923445566, total: 11111 },
+            "MCL1": { chromosome: "1", location: 140, disease: "Лимфома", start: 2933445566, end: 2934556677, total: 11111 },
+            "MDM2": { chromosome: "12", location: 140, disease: "Саркома", start: 2944556677, end: 2945667788, total: 11111 },
+            "MDM4": { chromosome: "1", location: 140, disease: "Рак легких", start: 2955667788, end: 2956778899, total: 11111 },
+            "MED12": { chromosome: "X", location: 140, disease: "Рак молочной железы", start: 2966778899, end: 2967889900, total: 11111 },
+            "MEF2B": { chromosome: "19", location: 140, disease: "Лимфома", start: 2977889900, end: 2978899011, total: 10111 },
+            "MEN1": { chromosome: "11", location: 140, disease: "Множественная эндокринная неоплазия", start: 2988990011, end: 2989001122, total: 11111 },
+            "MET": { chromosome: "7", location: 140, disease: "Рак легких", start: 2999001122, end: 2999112233, total: 11111 },
+            "MITF": { chromosome: "3", location: 140, disease: "Меланома", start: 3000112233, end: 3001223344, total: 11111 },
+            "MLH1": { chromosome: "3", location: 140, disease: "Синдром Линча", start: 3011223344, end: 3012334455, total: 11111 },
+            "MPL": { chromosome: "1", location: 140, disease: "Миелопролиферативные заболевания", start: 3022334455, end: 3023445566, total: 11111 },
+            "MRE11": { chromosome: "11", location: 140, disease: "Рак молочной железы", start: 3033445566, end: 3034556677, total: 11111 },
+            "MSH2": { chromosome: "2", location: 140, disease: "Синдром Линча", start: 3044556677, end: 3045667788, total: 11111 },
+            "MSH6": { chromosome: "2", location: 140, disease: "Синдром Линча", start: 3055667788, end: 3056778899, total: 11111 },
+            "MTOR": { chromosome: "1", location: 140, disease: "Рак почки", start: 3066778899, end: 3067889900, total: 11111 },
+            "MUTYH": { chromosome: "1", location: 140, disease: "Семейный аденоматозный полипоз", start: 3077889900, end: 3078899011, total: 10111 },
+            "MYB": { chromosome: "6", location: 140, disease: "Лимфома", start: 3088990011, end: 3089001122, total: 11111 },
+            "MYC": { chromosome: "8", location: 140, disease: "Лимфома, Рак молочной железы", start: 127735553, end: 127741874, total: 6321 },
+            "MYCL": { chromosome: "1", location: 140, disease: "Рак легких", start: 3100112233, end: 3101223344, total: 11111 },
+            "MYCN": { chromosome: "2", location: 140, disease: "Нейробластома", start: 3111223344, end: 3112334455, total: 11111 },
+                        "MYD88": { chromosome: "3", location: 140, disease: "Лимфома", start: 3122334455, end: 3123445566, total: 11111 },
+            "MYO18A": { chromosome: "14", location: 140, disease: "Рак легких", start: 3133445566, end: 3134556677, total: 11111 },
+            "NCOA3": { chromosome: "20", location: 140, disease: "Рак молочной железы", start: 3144556677, end: 3145667788, total: 11111 },
+            "NCOR1": { chromosome: "17", location: 140, disease: "Рак легких", start: 3155667788, end: 3156778899, total: 11111 },
+            "NF1": { chromosome: "17", location: 140, disease: "Нейрофиброматоз", start: 29437758, end: 29718799, total: 281041 },
+            "NF2": { chromosome: "22", location: 140, disease: "Нейрофиброматоз 2 типа", start: 3166778899, end: 3167889900, total: 11111 },
+            "NFE2L2": { chromosome: "2", location: 140, disease: "Рак легких", start: 3177889900, end: 3178899011, total: 10111 },
+            "NFKBIA": { chromosome: "14", location: 140, disease: "Лимфома", start: 3188990011, end: 3189001122, total: 11111 },
+            "NKX2-1": { chromosome: "14", location: 140, disease: "Рак легких", start: 3199001122, end: 3199112233, total: 11111 },
+            "NKX2-8": { chromosome: "14", location: 140, disease: "Рак легких", start: 3200112233, end: 3201223344, total: 11111 },
+            "NKX3-1": { chromosome: "8", location: 140, disease: "Рак простаты", start: 3211223344, end: 3212334455, total: 11111 },
+            "NOTCH1": { chromosome: "9", location: 140, disease: "Лимфома", start: 3222334455, end: 3223445566, total: 11111 },
+            "NOTCH2": { chromosome: "1", location: 140, disease: "Лимфома", start: 3233445566, end: 3234556677, total: 11111 },
+            "NOTCH3": { chromosome: "19", location: 140, disease: "Лимфома", start: 3244556677, end: 3245667788, total: 11111 },
+            "NOTCH4": { chromosome: "6", location: 140, disease: "Лимфома", start: 3255667788, end: 3256778899, total: 11111 },
+            "NPM1": { chromosome: "5", location: 140, disease: "Острый миелоидный лейкоз", start: 171573279, end: 171587937, total: 14658 },
+            "NRAS": { chromosome: "1", location: 140, disease: "Меланома", start: 3266778899, end: 3267889900, total: 11111 },
+            "NSD1": { chromosome: "5", location: 140, disease: "Острый миелоидный лейкоз", start: 3277889900, end: 3278899011, total: 10111 },
+            "NSD3": { chromosome: "8", location: 140, disease: "Острый миелоидный лейкоз", start: 3288990011, end: 3289001122, total: 11111 },
+            "NTRK1": { chromosome: "1", location: 140, disease: "Рак легких", start: 3299001122, end: 3299112233, total: 11111 },
+            "NTRK2": { chromosome: "9", location: 140, disease: "Рак легких", start: 3300112233, end: 3301223344, total: 11111 },
+            "NTRK3": { chromosome: "15", location: 140, disease: "Рак легких", start: 3311223344, end: 3312334455, total: 11111 },
+            "NUP93": { chromosome: "16", location: 140, disease: "Рак легких", start: 3322334455, end: 3323445566, total: 11111 },
+            "NUTM1": { chromosome: "15", location: 140, disease: "Рак легких", start: 3333445566, end: 3334556677, total: 11111 },
+            "PAK3": { chromosome: "X", location: 140, disease: "Рак молочной железы", start: 3344556677, end: 3345667788, total: 11111 },
+            "PAK5": { chromosome: "11", location: 140, disease: "Рак легких", start: 3355667788, end: 3356778899, total: 11111 },
+            "PALB2": { chromosome: "16", location: 140, disease: "Рак молочной железы", start: 3366778899, end: 3367889900, total: 11111 },
+            "PARK2": { chromosome: "6", location: 140, disease: "Рак легких", start: 3377889900, end: 3378899011, total: 10111 },
+            "PARP1": { chromosome: "1", location: 140, disease: "Рак молочной железы", start: 3388990011, end: 3389001122, total: 11111 },
+            "PARP2": { chromosome: "2", location: 140, disease: "Рак молочной железы", start: 3399001122, end: 3399112233, total: 11111 },
+            "PARP3": { chromosome: "3", location: 140, disease: "Рак молочной железы", start: 3400112233, end: 3401223344, total: 11111 },
+            "PARP4": { chromosome: "13", location: 140, disease: "Рак молочной железы", start: 3411223344, end: 3412334455, total: 11111 },
+            "PAX5": { chromosome: "9", location: 140, disease: "Лимфома", start: 3422334455, end: 3423445566, total: 11111 },
+            "PBRM1": { chromosome: "3", location: 140, disease: "Рак почки", start: 3433445566, end: 3434556677, total: 11111 },
+            "PDCD1": { chromosome: "2", location: 140, disease: "Лимфома", start: 3444556677, end: 3445667788, total: 11111 },
+            "PDCD1LG2": { chromosome: "9", location: 140, disease: "Лимфома", start: 3455667788, end: 3456778899, total: 11111 },
+            "PDGFRA": { chromosome: "4", location: 140, disease: "Гастроинтестинальная стромальная опухоль (GIST)", start: 3466778899, end: 3467889900, total: 11111 },
+            "PDGFRB": { chromosome: "5", location: 140, disease: "Миелопролиферативные заболевания", start: 3477889900, end: 3478899011, total: 10111 },
+            "PDK1": { chromosome: "20", location: 140, disease: "Рак молочной железы", start: 3488990011, end: 3489001122, total: 11111 },
+            "PGR": { chromosome: "11", location: 140, disease: "Рак молочной железы", start: 3499001122, end: 3499112233, total: 11111 },
+            "PHF6": { chromosome: "X", location: 140, disease: "Острый миелоидный лейкоз", start: 3500112233, end: 3501223344, total: 11111 },
+            "PHLPP2": { chromosome: "16", location: 140, disease: "Рак молочной железы", start: 3511223344, end: 3512334455, total: 11111 },
+            "PIK3C2B": { chromosome: "1", location: 140, disease: "Рак молочной железы", start: 3522334455, end: 3523445566, total: 11111 },
+            "PIK3C3": { chromosome: "18", location: 140, disease: "Рак молочной железы", start: 3533445566, end: 3534556677, total: 11111 },
+            "PIK3CA": { chromosome: "3", location: 140, disease: "Рак молочной железы", start: 178936091, end: 178963394, total: 27303 },
+            "PIK3CB": { chromosome: "3", location: 140, disease: "Рак молочной железы", start: 3544556677, end: 3545667788, total: 11111 },
+            "PIK3CG": { chromosome: "7", location: 140, disease: "Рак молочной железы", start: 3555667788, end: 3556778899, total: 11111 },
+            "PIK3R1": { chromosome: "5", location: 140, disease: "Рак молочной железы", start: 3566778899, end: 3567889900, total: 11111 },
+            "PIK3R2": { chromosome: "17", location: 140, disease: "Рак молочной железы", start: 3577889900, end: 3578899011, total: 10111 },
+            "PKHD1": { chromosome: "6", location: 140, disease: "Рак почки", start: 3588990011, end: 3589001122, total: 11111 },
+            "PLCG1": { chromosome: "20", location: 140, disease: "Рак молочной железы", start: 3599001122, end: 3599112233, total: 11111 },
+            "PLCG2": { chromosome: "16", location: 140, disease: "Рак молочной железы", start: 3600112233, end: 3601223344, total: 11111 },
+            "PMS2": { chromosome: "7", location: 140, disease: "Синдром Линча", start: 3611223344, end: 3612334455, total: 11111 },
+            "PNP": { chromosome: "14", location: 140, disease: "Рак легких", start: 3622334455, end: 3623445566, total: 11111 },
+            "PNRC1": { chromosome: "2", location: 140, disease: "Рак молочной железы", start: 3633445566, end: 3634556677, total: 11111 },
+            "POLD1": { chromosome: "19", location: 140, disease: "Рак молочной железы", start: 3644556677, end: 3645667788, total: 11111 },
+            "POLE": { chromosome: "12", location: 140, disease: "Рак молочной железы", start: 3655667788, end: 3656778899, total: 11111 },
+            "PPARG": { chromosome: "3", location: 140, disease: "Рак молочной железы", start: 3666778899, end: 3667889900, total: 11111 },
+            "PPP2R1A": { chromosome: "19", location: 140, disease: "Рак молочной железы", start: 3677889900, end: 3678899011, total: 10111 },
+            "PRDM1": { chromosome: "6", location: 140, disease: "Лимфома", start: 3688990011, end: 3689001122, total: 11111 },
+            "PREX2": { chromosome: "8", location: 140, disease: "Рак молочной железы", start: 3699001122, end: 3699112233, total: 11111 },
+            "PRF1": { chromosome: "10", location: 140, disease: "Лимфома", start: 3700112233, end: 3701223344, total: 11111 },
+            "PRKAR1A": { chromosome: "17", location: 140, disease: "Рак молочной железы", start: 3711223344, end: 3712334455, total: 11111 },
+            "PRKCI": { chromosome: "3", location: 140, disease: "Рак молочной железы", start: 3722334455, end: 3723445566, total: 11111 },
+            "PRKDC": { chromosome: "8", location: 140, disease: "Рак молочной железы", start: 3733445566, end: 3734556677, total: 11111 },
+            "PRPF40B": { chromosome: "1", location: 140, disease: "Рак молочной железы", start: 3744556677, end: 3745667788, total: 11111 },
+            "PRSS8": { chromosome: "4", location: 140, disease: "Рак молочной железы", start: 3755667788, end: 3756778899, total: 11111 },
+            "PTCH1": { chromosome: "9", location: 140, disease: "Базальноклеточный рак", start: 3766778899, end: 3767889900, total: 11111 },
+            "PTCH2": { chromosome: "1", location: 140, disease: "Базальноклеточный рак", start: 3777889900, end: 3778899011, total: 10111 },
+            "PTEN": { chromosome: "10", location: 140, disease: "Рак молочной железы", start: 87861841, end: 87971932, total: 110091 },
+            "PTK2": { chromosome: "8", location: 140, disease: "Рак молочной железы", start: 3788990011, end: 3789001122, total: 11111 },
+            "PTPN11": { chromosome: "12", location: 140, disease: "Лимфома", start: 3799001122, end: 3799112233, total: 11111 },
+            "PTPRC": { chromosome: "6", location: 140, disease: "Лимфома", start: 3800112233, end: 3801223344, total: 11111 },
+            "PTPRD": { chromosome: "9", location: 140, disease: "Рак легких", start: 3811223344, end: 3812334455, total: 11111 },
+            "QKI": { chromosome: "6", location: 140, disease: "Рак молочной железы", start: 3822334455, end: 3823445566, total: 11111 },
+            "RAB35": { chromosome: "1", location: 140, disease: "Рак молочной железы", start: 3833445566, end: 3834556677, total: 11111 },
+            "RAC1": { chromosome: "7", location: 140, disease: "Рак молочной железы", start: 3844556677, end: 3845667788, total: 11111 },
+            "RAC2": { chromosome: "22", location: 140, disease: "Рак молочной железы", start: 3855667788, end: 3856778899, total: 11111 },
+            "RAD17": { chromosome: "5", location: 140, disease: "Рак молочной железы", start: 3866778899, end: 3867889900, total: 11111 },
+            "RAD50": { chromosome: "5", location: 140, disease: "Рак молочной железы", start: 3877889900, end: 3878899011, total: 10111 },
+            "RAD51": { chromosome: "15", location: 140, disease: "Рак молочной железы", start: 3888990011, end: 3889001122, total: 11111 },
+            "RAD51B": { chromosome: "14", location: 140, disease: "Рак молочной железы", start: 3899001122, end: 3899112233, total: 11111 },
+            "RAD51C": { chromosome: "17", location: 140, disease: "Рак молочной железы", start: 3900112233, end: 3901223344, total: 11111 },
+            "RAD51D": { chromosome: "17", location: 140, disease: "Рак молочной железы", start: 3911223344, end: 3912334455, total: 11111 },
+            "RAD52": { chromosome: "12", location: 140, disease: "Рак молочной железы", start: 3922334455, end: 3923445566, total: 11111 },
+            "RAD54L": { chromosome: "22", location: 140, disease: "Рак молочной железы", start: 3933445566, end: 3934556677, total: 11111 },
+            "RAF1": { chromosome: "3", location: 140, disease: "Рак молочной железы", start: 3944556677, end: 3945667788, total: 11111 },
+            "RANBP2": { chromosome: "2", location: 140, disease: "Рак молочной железы", start: 3955667788, end: 3956778899, total: 11111 },
+            "RARA": { chromosome: "17", location: 140, disease: "Острый миелоидный лейкоз", start: 3966778899, end: 3967889900, total: 11111 },
+            "RB1": { chromosome: "13", location: 140, disease: "Ретинобластома", start: 48877576, end: 49054416, total: 176840 },
+            "RBM10": { chromosome: "X", location: 140, disease: "Рак легких", start: 3977889900, end: 3978899011, total: 10111 },
+            "REL": { chromosome: "2", location: 140, disease: "Лимфома", start: 3988990011, end: 3989001122, total: 11111 },
+            "RET": { chromosome: "10", location: 140, disease: "Рак щитовидной железы", start: 43125483, end: 43140654, total: 15171 },
+            "RHEB": { chromosome: "12", location: 140, disease: "Рак молочной железы", start: 3999001122, end: 3999112233, total: 11111 },
+            "RHOA": { chromosome: "3", location: 140, disease: "Рак молочной железы", start: 4000112233, end: 4001223344, total: 11111 },
+            "RHOB": { chromosome: "19", location: 140, disease: "Рак молочной железы", start: 4011223344, end: 4012334455, total: 11111 },
+            "RICTOR": { chromosome: "5", location: 140, disease: "Рак молочной железы", start: 4022334455, end: 4023445566, total: 11111 },
+            "RNF43": { chromosome: "17", location: 140, disease: "Рак молочной железы", start: 4033445566, end: 4034556677, total: 11111 },
+            "ROBO1": { chromosome: "3", location: 140, disease: "Рак молочной железы", start: 4044556677, end: 4045667788, total: 11111 },
+            "ROBO2": { chromosome: "3", location: 140, disease: "Рак молочной железы", start: 4055667788, end: 4056778899, total: 11111 },
+            "ROS1": { chromosome: "6", location: 140, disease: "Рак легких", start: 28183115, end: 28212745, total: 29630 },
+            "RPA1": { chromosome: "17", location: 140, disease: "Рак молочной железы", start: 4066778899, end: 4067889900, total: 11111 },
+            "RPS6KB1": { chromosome: "17", location: 140, disease: "Рак молочной железы", start: 4077889900, end: 4078899011, total: 10111 },
+            "RPTOR": { chromosome: "17", location: 140, disease: "Рак молочной железы", start: 4088990011, end: 4089001122, total: 11111 },
+            "RUNX1": { chromosome: "21", location: 140, disease: "Острый миелоидный лейкоз", start: 4099001122, end: 4099112233, total: 11111 },
+            "RUNX1T1": { chromosome: "8", location: 140, disease: "Острый миелоидный лейкоз", start: 4100112233, end: 4101223344, total: 11111 },
+            "RUNX3": { chromosome: "1", location: 140, disease: "Рак молочной железы", start: 4111223344, end: 4112334455, total: 11111 },
+            "SDHA": { chromosome: "5", location: 140, disease: "Рак молочной железы", start: 4122334455, end: 4123445566, total: 11111 },
+            "SDHB": { chromosome: "1", location: 140, disease: "Рак молочной железы", start: 4133445566, end: 4134556677, total: 11111 },
+            "SDHC": { chromosome: "1", location: 140, disease: "Рак молочной железы", start: 4144556677, end: 4145667788, total: 11111 },
+            "SDHD": { chromosome: "11", location: 140, disease: "Рак молочной железы", start: 4155667788, end: 4156778899, total: 11111 },
+            "SEMA3A": { chromosome: "3", location: 140, disease: "Рак молочной железы", start: 4166778899, end: 4167889900, total: 11111 },
+            "SEMA3E": { chromosome: "7", location: 140, disease: "Рак молочной железы", start: 4177889900, end: 4178899011, total: 10111 },
+            "SET": { chromosome: "9", location: 140, disease: "Рак молочной железы", start: 4188990011, end: 4189001122, total: 11111 },
+            "SETBP1": { chromosome: "12", location: 140, disease: "Рак молочной железы", start: 4199001122, end: 4199112233, total: 11111 },
+            "SETD2": { chromosome: "3", location: 140, disease: "Рак молочной железы", start: 4200112233, end: 4201223344, total: 11111 },
+            "SF3A1": { chromosome: "17", location: 140, disease: "Рак молочной железы", start: 4211223344, end: 4212334455, total: 11111 },
+            "SF3B1": { chromosome: "2", location: 140, disease: "Рак молочной железы", start: 24734842, end: 24769321, total: 34479 },
+            "SH2B3": { chromosome: "12", location: 140, disease: "Рак молочной железы", start: 4222334455, end: 4223445566, total: 11111 },
+            "SKP2": { chromosome: "5", location: 140, disease: "Рак молочной железы", start: 4233445566, end: 4234556677, total: 11111 },
+            "SLIT2": { chromosome: "4", location: 140, disease: "Рак молочной железы", start: 4244556677, end: 4245667788, total: 11111 },
+                        "SLIT2": { chromosome: "4", location: 140, disease: "Рак молочной железы", start: 4244556677, end: 4245667788, total: 11111 },
+            "SMAD2": { chromosome: "18", location: 140, disease: "Рак молочной железы", start: 4255667788, end: 4256778899, total: 11111 },
+            "SMAD3": { chromosome: "15", location: 140, disease: "Рак молочной железы", start: 4266778899, end: 4267889900, total: 11111 },
+            "SMAD4": { chromosome: "18", location: 140, disease: "Рак молочной железы", start: 55079112, end: 55138889, total: 59777 },
+            "SMARCA1": { chromosome: "2", location: 140, disease: "Рак молочной железы", start: 4277889900, end: 4278899011, total: 10111 },
+            "SMARCA4": { chromosome: "19", location: 140, disease: "Рак молочной железы", start: 4288990011, end: 4289001122, total: 11111 },
+            "SMARCB1": { chromosome: "22", location: 140, disease: "Рак молочной железы", start: 4299001122, end: 4299112233, total: 11111 },
+            "SMARCD1": { chromosome: "3", location: 140, disease: "Рак молочной железы", start: 4300112233, end: 4301223344, total: 11111 },
+            "SMO": { chromosome: "7", location: 140, disease: "Рак молочной железы", start: 4311223344, end: 4312334455, total: 11111 },
+            "SNCAIP": { chromosome: "10", location: 140, disease: "Рак молочной железы", start: 4322334455, end: 4323445566, total: 11111 },
+            "SOCS1": { chromosome: "16", location: 140, disease: "Рак молочной железы", start: 4333445566, end: 4334556677, total: 11111 },
+            "SOX10": { chromosome: "22", location: 140, disease: "Рак молочной железы", start: 4344556677, end: 4345667788, total: 11111 },
+            "SOX2": { chromosome: "3", location: 140, disease: "Рак молочной железы", start: 36714431, end: 36716438, total: 2007 },
+            "SOX9": { chromosome: "17", location: 140, disease: "Рак молочной железы", start: 4355667788, end: 4356778899, total: 11111 },
+            "SPEN": { chromosome: "1", location: 140, disease: "Рак молочной железы", start: 4366778899, end: 4367889900, total: 11111 },
+            "SPOP": { chromosome: "17", location: 140, disease: "Рак молочной железы", start: 4377889900, end: 4378899011, total: 10111 },
+            "SPTA1": { chromosome: "1", location: 140, disease: "Рак молочной железы", start: 4388990011, end: 4389001122, total: 11111 },
+            "SRC": { chromosome: "20", location: 140, disease: "Рак молочной железы", start: 4399001122, end: 4399112233, total: 11111 },
+            "SRSF1": { chromosome: "17", location: 140, disease: "Рак молочной железы", start: 4400112233, end: 4401223344, total: 11111 },
+            "SRSF2": { chromosome: "17", location: 140, disease: "Рак молочной железы", start: 4411223344, end: 4412334455, total: 11111 },
+            "SRSF7": { chromosome: "7", location: 140, disease: "Рак молочной железы", start: 4422334455, end: 4423445566, total: 11111 },
+            "STAG2": { chromosome: "X", location: 140, disease: "Рак молочной железы", start: 4433445566, end: 4434556677, total: 11111 },
+            "STAT3": { chromosome: "17", location: 140, disease: "Рак молочной железы", start: 4444556677, end: 4445667788, total: 11111 },
+            "STAT4": { chromosome: "2", location: 140, disease: "Рак молочной железы", start: 4455667788, end: 4456778899, total: 11111 },
+            "STK11": { chromosome: "19", location: 140, disease: "Рак молочной железы", start: 12038259, end: 12177724, total: 139465 },
+            "SUFU": { chromosome: "10", location: 140, disease: "Рак молочной железы", start: 4466778899, end: 4467889900, total: 11111 },
+            "SYK": { chromosome: "9", location: 140, disease: "Рак молочной железы", start: 4477889900, end: 4478899011, total: 10111 },
+            "TACC3": { chromosome: "4", location: 140, disease: "Рак молочной железы", start: 4488990011, end: 4489001122, total: 11111 },
+            "TAF1": { chromosome: "X", location: 140, disease: "Рак молочной железы", start: 4499001122, end: 4499112233, total: 11111 },
+            "TBX22": { chromosome: "X", location: 140, disease: "Рак молочной железы", start: 4500112233, end: 4501223344, total: 11111 },
+            "TBX3": { chromosome: "12", location: 140, disease: "Рак молочной железы", start: 4511223344, end: 4512334455, total: 11111 },
+            "TERC": { chromosome: "3", location: 140, disease: "Рак молочной железы", start: 4522334455, end: 4523445566, total: 11111 },
+            "TERT": { chromosome: "5", location: 140, disease: "Рак молочной железы", start: 1254522, end: 1296117, total: 41595 },
+            "TET2": { chromosome: "4", location: 140, disease: "Рак молочной железы", start: 4533445566, end: 4534556677, total: 11111 },
+            "TGFBR2": { chromosome: "3", location: 140, disease: "Рак молочной железы", start: 4544556677, end: 4545667788, total: 11111 },
+            "TIAF1": { chromosome: "12", location: 140, disease: "Рак молочной железы", start: 4555667788, end: 4556778899, total: 11111 },
+            "TIGIT": { chromosome: "3", location: 140, disease: "Рак молочной железы", start: 4566778899, end: 4567889900, total: 11111 },
+            "TIPARP": { chromosome: "3", location: 140, disease: "Рак молочной железы", start: 4577889900, end: 4578899011, total: 10111 },
+            "TMPRSS2": { chromosome: "21", location: 140, disease: "Рак молочной железы", start: 4588990011, end: 4589001122, total: 11111 },
+            "TNF": { chromosome: "6", location: 140, disease: "Рак молочной железы", start: 4599001122, end: 4599112233, total: 11111 },
+            "TNFAIP3": { chromosome: "6", location: 140, disease: "Рак молочной железы", start: 4600112233, end: 4601223344, total: 11111 },
+            "TNFRSF14": { chromosome: "1", location: 140, disease: "Рак молочной железы", start: 4611223344, end: 4612334455, total: 11111 },
+            "TNFRSF18": { chromosome: "1", location: 140, disease: "Рак молочной железы", start: 4622334455, end: 4623445566, total: 11111 },
+            "TNFRSF4": { chromosome: "1", location: 140, disease: "Рак молочной железы", start: 4633445566, end: 4634556677, total: 11111 },
+            "TNFSF13B": { chromosome: "17", location: 140, disease: "Рак молочной железы", start: 4644556677, end: 4645667788, total: 11111 },
+            "TNKS": { chromosome: "8", location: 140, disease: "Рак молочной железы", start: 4655667788, end: 4656778899, total: 11111 },
+            "TNKS2": { chromosome: "10", location: 140, disease: "Рак молочной железы", start: 4666778899, end: 4667889900, total: 11111 },
+            "TOP1": { chromosome: "20", location: 140, disease: "Рак молочной железы", start: 4677889900, end: 4678899011, total: 10111 },
+            "TOP2A": { chromosome: "17", location: 140, disease: "Рак молочной железы", start: 4688990011, end: 4689001122, total: 11111 },
+            "TP53": { chromosome: "17", location: 140, disease: "Рак молочной железы", start: 7673757, end: 7675276, total: 1519 },
+            "TRAF7": { chromosome: "16", location: 140, disease: "Рак молочной железы", start: 4699001122, end: 4699112233, total: 11111 },
+            "TRRAP": { chromosome: "11", location: 140, disease: "Рак молочной железы", start: 4700112233, end: 4701223344, total: 11111 },
+            "TSC1": { chromosome: "9", location: 140, disease: "Рак молочной железы", start: 4711223344, end: 4712334455, total: 11111 },
+            "TSC2": { chromosome: "16", location: 140, disease: "Рак молочной железы", start: 4722334455, end: 4723445566, total: 11111 },
+            "TSHR": { chromosome: "14", location: 140, disease: "Рак молочной железы", start: 4733445566, end: 4734556677, total: 11111 },
+            "U2AF1": { chromosome: "21", location: 140, disease: "Рак молочной железы", start: 4744556677, end: 4745667788, total: 11111 },
+            "U2AF2": { chromosome: "19", location: 140, disease: "Рак молочной железы", start: 4755667788, end: 4756778899, total: 11111 },
+            "USP9X": { chromosome: "X", location: 140, disease: "Рак молочной железы", start: 4766778899, end: 4767889900, total: 11111 },
+            "VEGFA": { chromosome: "6", location: 140, disease: "Рак молочной железы", start: 4777889900, end: 4778899011, total: 10111 },
+            "VHL": { chromosome: "3", location: 140, disease: "Рак молочной железы", start: 10140990, end: 10151174, total: 10184 },
+            "VSIR": { chromosome: "7", location: 140, disease: "Рак молочной железы", start: 4788990011, end: 4789001122, total: 11111 },
+            "VTCN1": { chromosome: "1", location: 140, disease: "Рак молочной железы", start: 4799001122, end: 4799112233, total: 11111 },
+            "WISP3": { chromosome: "6", location: 140, disease: "Рак молочной железы", start: 4800112233, end: 4801223344, total: 11111 },
+            "WNT1": { chromosome: "12", location: 140, disease: "Рак молочной железы", start: 4811223344, end: 4812334455, total: 11111 },
+            "WT1": { chromosome: "11", location: 140, disease: "Рак молочной железы", start: 32467700, end: 32496247, total: 28547 },
+            "WWP1": { chromosome: "8", location: 140, disease: "Рак молочной железы", start: 4822334455, end: 4823445566, total: 11111 },
+            "XBP1": { chromosome: "22", location: 140, disease: "Рак молочной железы", start: 4833445566, end: 4834556677, total: 11111 },
+            "XPO1": { chromosome: "2", location: 140, disease: "Рак молочной железы", start: 4844556677, end: 4845667788, total: 11111 },
+            "XRCC3": { chromosome: "14", location: 140, disease: "Рак молочной железы", start: 4855667788, end: 4856778899, total: 11111 },
+            "ZBTB2": { chromosome: "2", location: 140, disease: "Рак молочной железы", start: 4866778899, end: 4867889900, total: 11111 },
+            "ZNF217": { chromosome: "20", location: 140, disease: "Рак молочной железы", start: 4877889900, end: 4878899011, total: 10111 },
+            "ZNF703": { chromosome: "8", location: 140, disease: "Рак молочной железы", start: 4888990011, end: 4889001122, total: 11111 },
+            "ZRSR2": { chromosome: "X", location: 140, disease: "Рак молочной железы", start: 4899001122, end: 4899112233, total: 11111 },
+            "APP": { chromosome: "21", location: 140, disease: "Болезнь Альцгеймера", start: 4900112233, end: 4901223344, total: 11111 },
+            "PSEN1": { chromosome: "14", location: 140, disease: "Болезнь Альцгеймера", start: 4911223344, end: 4912334455, total: 11111 },
+            "F8": { chromosome: "X", location: 140, disease: "Гемофилия A", start: 154733671, end: 154914364, total: 180693 },
+            "F9": { chromosome: "X", location: 140, disease: "Гемофилия B", start: 138356326, end: 138389575, total: 33249 },
+            "CACNA1C": { chromosome: "13", location: 140, disease: "Синдром удлиненного интервала QT, Тимоти синдром", start: 4922334455, end: 4923445566, total: 11111 },
+            "SCN1A": { chromosome: "2", location: 140, disease: "Эпилепсия (синдром Драве)", start: 4933445566, end: 4934556677, total: 11111 },
+            "GJB2": { chromosome: "13", location: 140, disease: "Наследственная потеря слуха", start: 4944556677, end: 4945667788, total: 11111 },
+            "LRRK2": { chromosome: "12", location: 140, disease: "Болезнь Паркинсона", start: 4955667788, end: 4956778899, total: 11111 },
+            "PINK1": { chromosome: "1", location: 140, disease: "Болезнь Паркинсона", start: 4966778899, end: 4967889900, total: 10111 },
+            "VWF": { chromosome: "12", location: 140, disease: "Болезнь Виллебранда", start: 4977889900, end: 4978899011, total: 11111 },
+            "MYH7": { chromosome: "14", location: 140, disease: "Гипертрофическая кардиомиопатия", start: 105759212, end: 106004483, total: 245271 },
+            "RYR2": { chromosome: "4", location: 140, disease: "Катехоламинергическая полиморфная желудочковая тахикардия", start: 4988990011, end: 4989001122, total: 11111 },
+            "KCNQ1": { chromosome: "11", location: 140, disease: "Синдром удлиненного интервала QT", start: 4999001122, end: 4999112233, total: 11111 },
+            "COL1A1": { chromosome: "17", location: 140, disease: "Несовершенный остеогенез", start: 5000112233, end: 5001223344, total: 11111 },
+            "FBN1": { chromosome: "15", location: 140, disease: "Синдром Марфана", start: 5011223344, end: 5012334455, total: 11111 },
+            "HFE": { chromosome: "6", location: 140, disease: "Гемохроматоз", start: 26093198, end: 29639783, total: 3546585 },
+            "CFTR": { chromosome: "7", location: 140, disease: "Муковисцидоз", start: 117119959, end: 117308717, total: 188758 },
+            "DMD": { chromosome: "X", location: 140, disease: "Мышечная дистрофия Дюшенна", start: 31042438, end: 33284256, total: 2241818 },
+            "SMN1": { chromosome: "5", location: 140, disease: "Спинальная мышечная атрофия", start: 70856837, end: 70884444, total: 27607 },
+            "PAH": { chromosome: "12", location: 140, disease: "Фенилкетонурия", start: 5022334455, end: 5023445566, total: 11111 },
+            "GALT": { chromosome: "9", location: 140, disease: "Галактоземия", start: 5033445566, end: 5034556677, total: 11111 },
+            "HEXA": { chromosome: "15", location: 140, disease: "Болезнь Тея-Сакса", start: 5044556677, end: 5045667788, total: 11111 },
+            "ATP7B": { chromosome: "13", location: 140, disease: "Болезнь Вильсона", start: 5055667788, end: 5056778899, total: 11111 },
+            "FMR1": { chromosome: "X", location: 140, disease: "Синдром ломкой X-хромосомы", start: 147930511, end: 147971181, total: 40670 },
+            "HBB": { chromosome: "11", location: 140, disease: "Серповидноклеточная анемия, Бета-талассемия", start: 5225465, end: 5227024, total: 1559 },
+            "PKD1": { chromosome: "16", location: 140, disease: "Аутосомно-доминантная поликистозная болезнь почек", start: 5066778899, end: 5067889900, total: 10111 },
+            "TSC1": { chromosome: "9", location: 140, disease: "Туберозный склероз", start: 5077889900, end: 5078899011, total: 10111 },
+            "TSC1": { chromosome: "9", location: 140, disease: "Туберозный склероз, Опухоли головного мозга, Почечные ангиомиолипомы", start: 5088990011, end: 5089001122, total: 11111 },
+            "TSC2": { chromosome: "16", location: 140, disease: "Туберозный склероз, Почечные кисты, Лимфангиолейомиоматоз", start: 5099001122, end: 5099112233, total: 11111 },
+            "VHL": { chromosome: "3", location: 140, disease: "Болезнь Гиппеля-Линдау, Почечно-клеточный рак, Феохромоцитома", start: 10140990, end: 10151174, total: 10184 },
+            "WT1": { chromosome: "11", location: 140, disease: "Опухоль Вильмса, Синдром Дениса-Драша, Синдром Фрайзера", start: 32467700, end: 32496247, total: 28547 },
+            "XPA": { chromosome: "9", location: 140, disease: "Пигментная ксеродерма", start: 5100112233, end: 5101223344, total: 11111 },
+            "XPC": { chromosome: "3", location: 140, disease: "Пигментная ксеродерма", start: 5111223344, end: 5112334455, total: 11111 },
+            "ZMPSTE24": { chromosome: "1", location: 140, disease: "Прогерия, Синдром Хатчинсона-Гилфорда", start: 5122334455, end: 5123445566, total: 11111 },
+            "ABCA4": { chromosome: "1", location: 140, disease: "Пигментный ретинит, Макулодистрофия Штаргардта", start: 5133445566, end: 5134556677, total: 11111 },
+            "ACTA1": { chromosome: "1", location: 140, disease: "Немалиновая миопатия", start: 5144556677, end: 5145667788, total: 11111 },
+            "ADAMTS2": { chromosome: "5", location: 140, disease: "Синдром Элерса-Данлоса (тип VIIC)", start: 5155667788, end: 5156778899, total: 11111 },
+            "ALDH3A2": { chromosome: "17", location: 140, disease: "Синдром Шегрена-Ларссона", start: 5166778899, end: 5167889900, total: 10111 },
+            "APC": { chromosome: "5", location: 140, disease: "Семейный аденоматозный полипоз", start: 112054744, end: 112147431, total: 92687 },
+            "ARSA": { chromosome: "22", location: 140, disease: "Метахроматическая лейкодистрофия", start: 5177889900, end: 5178899011, total: 11111 },
+            "ATM": { chromosome: "11", location: 140, disease: "Атаксия-телеангиэктазия", start: 117913137, end: 117982038, total: 68901 },
+            "BBS1": { chromosome: "11", location: 140, disease: "Синдром Барде-Бидля", start: 5188990011, end: 5189001122, total: 11111 },
+            "CACNA1A": { chromosome: "19", location: 140, disease: "Эпизодическая атаксия, Мигрень с аурой", start: 5199001122, end: 5199112233, total: 11111 },
+            "CDH23": { chromosome: "10", location: 140, disease: "Синдром Ашера (тип 1D)", start: 5200112233, end: 5201223344, total: 11111 },
+                        "COL1A1": { chromosome: "17", location: 140, disease: "Несовершенный остеогенез", start: 5211223344, end: 5212334455, total: 11111 },
+            "CRYAB": { chromosome: "11", location: 140, disease: "Миопатия, Катаракта", start: 5222334455, end: 5223445566, total: 11111 },
+            "DMD": { chromosome: "X", location: 140, disease: "Мышечная дистрофия Дюшенна", start: 31042438, end: 33284256, total: 2241818 },
+            "ELN": { chromosome: "7", location: 140, disease: "Синдром Вильямса", start: 5233445566, end: 5234556677, total: 11111 },
+            "FBN1": { chromosome: "15", location: 140, disease: "Синдром Марфана", start: 5244556677, end: 5245667788, total: 11111 },
+            "FGFR3": { chromosome: "4", location: 140, disease: "Ахондроплазия, Гипохондроплазия", start: 1807174, end: 1824993, total: 178219 },
+            "GAA": { chromosome: "17", location: 140, disease: "Болезнь Помпе", start: 5255667788, end: 5256778899, total: 11111 },
+            "GBA": { chromosome: "1", location: 140, disease: "Болезнь Гоше, Болезнь Паркинсона", start: 155259172, end: 155266148, total: 6976 },
+            "HFE": { chromosome: "6", location: 140, disease: "Гемохроматоз", start: 26093198, end: 29639783, total: 3546585 },
+            "HPRT1": { chromosome: "X", location: 140, disease: "Синдром Леша-Нихена", start: 5266778899, end: 5267889900, total: 10111 },
+            "IDUA": { chromosome: "4", location: 140, disease: "Мукополисахаридоз I типа (синдром Гурлера)", start: 5277889900, end: 5278899011, total: 11111 },
+            "KCNQ1": { chromosome: "11", location: 140, disease: "Синдром удлиненного интервала QT (тип 1)", start: 50778899, end: 50864717, total: 85818 },
+            "LDLR": { chromosome: "19", location: 140, disease: "Семейная гиперхолестеринемия", start: 5288990011, end: 5289001122, total: 11111 },
+            "LMNA": { chromosome: "1", location: 140, disease: "Прогерия, Мышечная дистрофия Эмери-Дрейфуса", start: 156091810, end: 156115414, total: 23604 },
+            "MECP2": { chromosome: "X", location: 140, disease: "Синдром Ретта", start: 152791711, end: 152830748, total: 39037 },
+            "MYH7": { chromosome: "14", location: 140, disease: "Гипертрофическая кардиомиопатия", start: 105759212, end: 106004483, total: 245271 },
+            "NF1": { chromosome: "17", location: 140, disease: "Нейрофиброматоз типа 1", start: 29437758, end: 29718799, total: 281041 },
+            "OTC": { chromosome: "X", location: 140, disease: "Орнитинтранскарбамилазная недостаточность", start: 5299001122, end: 5299112233, total: 11111 },
+            "PAH": { chromosome: "12", location: 140, disease: "Фенилкетонурия", start: 5022334455, end: 5023445566, total: 11111 },
+            "PKD1": { chromosome: "16", location: 140, disease: "Поликистоз почек (тип 1)", start: 5066778899, end: 5067889900, total: 10111 },
+            "PMP22": { chromosome: "17", location: 140, disease: "Наследственная нейропатия с предрасположенностью к параличам от сдавления", start: 5300112233, end: 5301223344, total: 11111 },
+            "PRNP": { chromosome: "20", location: 140, disease: "Болезнь Крейтцфельдта-Якоба", start: 5311223344, end: 5312334455, total: 11111 },
+            "PTEN": { chromosome: "10", location: 140, disease: "Синдром Коудена", start: 87861841, end: 87971932, total: 110091 },
+            "RYR1": { chromosome: "19", location: 140, disease: "Злокачественная гипертермия, Центральное ядро миопатия", start: 5322334455, end: 5323445566, total: 11111 },
+            "SLC26A4": { chromosome: "7", location: 140, disease: "Синдром Пендреда" , start: 95410778, end: 95454494, total: 43716},
+            "SLC26A4": { chromosome: "7", location: 140, disease: "Синдром Пендреда, Потеря слуха" , start: 95410778, end: 95454494, total: 43716},
+            "SLC34A2": { chromosome: "4", location: 140, disease: "Легочный альвеолярный микролитиаз", start: 5333445566, end: 5334556677, total: 11111 },
+            "SLC37A4": { chromosome: "11", location: 140, disease: "Болезнь Гирке (гликогеноз типа Ib)", start: 5344556677, end: 5345667788, total: 11111 },
+            "SLC45A2": { chromosome: "5", location: 140, disease: "Альбинизм (тип 4)", start: 5355667788, end: 5356778899, total: 11111 },
+            "SLC6A3": { chromosome: "5", location: 140, disease: "Синдром дефицита дофаминового транспортера", start: 5366778899, end: 5367889900, total: 10111 },
+            "SLC6A8": { chromosome: "X", location: 140, disease: "Синдром дефицита креатина", start: 5377889900, end: 5378899011, total: 11111 },
+            "SLC7A7": { chromosome: "14", location: 140, disease: "Лизинурическая непереносимость белка", start: 5388990011, end: 5389001122, total: 11111 },
+            "SLC9A6": { chromosome: "X", location: 140, disease: "Синдром Кристиансона", start: 5399001122, end: 5399112233, total: 11111 },
+            "SLC12A1": { chromosome: "15", location: 140, disease: "Синдром Барттера (тип 1)", start: 5400112233, end: 5401223344, total: 11111 },
+            "SLC16A2": { chromosome: "X", location: 140, disease: "Синдром Аллана-Херндона-Дадли", start: 5411223344, end: 5412334455, total: 11111 },
+            "SLC25A13": { chromosome: "7", location: 140, disease: "Цитруллинемия (тип II)", start: 5422334455, end: 5423445566, total: 11111 },
+            "SLC25A20": { chromosome: "3", location: 140, disease: "Дефицит карнитин-ацилкарнитинового транспортера", start: 5433445566, end: 5434556677, total: 11111 },
+            "SLC25A22": { chromosome: "1", location: 140, disease: "Эпилептическая энцефалопатия", start: 5444556677, end: 5445667788, total: 11111 },
+            "SLC2A1": { chromosome: "1", location: 140, disease: "Дефицит GLUT1", start: 5455667788, end: 5456778899, total: 11111 },
+            "SLC2A2": { chromosome: "11", location: 140, disease: "Синдром Фанкони-Бикеля", start: 5466778899, end: 5467889900, total: 10111 },
+            "SLC3A1": { chromosome: "2", location: 140, disease: "Цистинурия", start: 5477889900, end: 5478899011, total: 11111 },
+            "SLC4A1": { chromosome: "17", location: 140, disease: "Сфероцитоз, Ацидоз почечных канальцев", start: 5488990011, end: 5489001122, total: 11111 },
+            "SLC5A2": { chromosome: "16", location: 140, disease: "Почечная глюкозурия", start: 5499001122, end: 5499112233, total: 11111 },
+            "SLC6A1": { chromosome: "3", location: 140, disease: "Эпилепсия, Аутизм", start: 5500112233, end: 5501223344, total: 11111 },
+            "SLC6A4": { chromosome: "17", location: 140, disease: "Депрессия, Тревожные расстройства", start: 5511223344, end: 5512334455, total: 11111 },
+            "SLC7A9": { chromosome: "19", location: 140, disease: "Цистинурия (тип B)", start: 5522334455, end: 5523445566, total: 11111 },
+            "SLC9A3": { chromosome: "1", location: 140, disease: "Врожденная хлоридная диарея", start: 5533445566, end: 5534556677, total: 11111 },
+            "SLC12A3": { chromosome: "16", location: 140, disease: "Синдром Гительмана", start: 5544556677, end: 5545667788, total: 11111 },
+            "SLC16A1": { chromosome: "1", location: 140, disease: "Дефицит MCT1", start: 5555667788, end: 5556778899, total: 11111 },
+            "SLC17A5": { chromosome: "6", location: 140, disease: "Синдром Салла", start: 5566778899, end: 5567889900, total: 11111 },
+            "SLC22A5": { chromosome: "5", location: 140, disease: "Дефицит карнитина", start: 5577889900, end: 5578899011, total: 10111 },
+            "SLC25A15": { chromosome: "2", location: 140, disease: "Гипераммониемия (тип II)", start: 5588990011, end: 5589001122, total: 11111 },
+            "SLC25A19": { chromosome: "3", location: 140, disease: "Синдром Амато-Ламберти", start: 5599001122, end: 5599112233, total: 11111 },
+            "SLC25A20": { chromosome: "3", location: 140, disease: "Дефицит карнитин-ацилкарнитинового транспортера", start: 5600112233, end: 5601223344, total: 11111 },
+            "SLC17A5": { chromosome: "6", location: 140, disease: "Синдром Салла", start: 5566778899, end: 5567889900, total: 11111 },
+            "SLC22A5": { chromosome: "5", location: 140, disease: "Дефицит карнитина", start: 5577889900, end: 5578899011, total: 10111 },
+            "SLC25A13": { chromosome: "7", location: 140, disease: "Цитруллинемия (тип II)", start: 5422334455, end: 5423445566, total: 11111 },
+            "SLC25A20": { chromosome: "3", location: 140, disease: "Дефицит карнитин-ацилкарнитинтранслоказы", start: 5433445566, end: 5434556677, total: 11111 },
+            "SLC35A2": { chromosome: "3", location: 140, disease: "Врожденные нарушения гликозилирования", start: 5611223344, end: 5612334455, total: 11111 },
+            "SLC39A4": { chromosome: "8", location: 140, disease: "Акро-дерматит энтеропатический", start: 5622334455, end: 5623445566, total: 11111 },
+            "SLC45A2": { chromosome: "5", location: 140, disease: "Альбинизм (тип 4)", start: 5355667788, end: 5356778899, total: 11111 },
+            "SLC52A2": { chromosome: "9", location: 140, disease: "Синдром Брауна-Виалетто-Ван Лэра", start: 5633445566, end: 5634556677, total: 11111 },
+            "SMAD4": { chromosome: "18", location: 140, disease: "Синдром Ювенильного полипоза, Наследственный геморрагический телеангиэктазия", start: 55079112, end: 55138889, total: 59777 },
+            "SMARCA4": { chromosome: "19", location: 140, disease: "Синдром Коффина-Сириса, Рак легких", start: 5644556677, end: 5645667788, total: 11111 },
+            "SOS1": { chromosome: "2", location: 140, disease: "Синдром Нунан", start: 5655667788, end: 5656778899, total: 11111 },
+            "SPINK1": { chromosome: "5", location: 140, disease: "Хронический панкреатит", start: 5666778899, end: 5667889900, total: 11111 },
+            "STAT3": { chromosome: "17", location: 140, disease: "Аутоиммунные заболевания, Гипер-IgE синдром", start: 4444556677, end: 4445667788, total: 11111 },
+            "STK11": { chromosome: "19", location: 140, disease: "Синдром Пейтца-Егерса", start: 12038259, end: 12177724, total: 139465 },
+            "TERT": { chromosome: "5", location: 140, disease: "Апластическая анемия, Легочный фиброз", start: 1254522, end: 1296117, total: 41595 },
+            "TGFBR1": { chromosome: "9", location: 140, disease: "Синдром Лойса-Дитца", start: 5677889900, end: 5678899011, total: 10111 },
+            "TGFBR2": { chromosome: "3", location: 140, disease: "Синдром Лойса-Дитца, Синдром Марфана", start: 17464007, end: 17490581, total: 26574 },
+            "TGFBR2": { chromosome: "3", location: 140, disease: "Синдром Лойса-Дитца, Синдром Марфана", start: 17464007, end: 17490581, total: 26574 },
+            "TMEM127": { chromosome: "2", location: 140, disease: "Феохромоцитома, Параганглиома", start: 5688990011, end: 5689001122, total: 11111 },
+            "TP53": { chromosome: "17", location: 140, disease: "Синдром Ли-Фраумени, Рак молочной железы, Саркомы", start: 7673757, end: 7675276, total: 1519 },
+            "TSC1": { chromosome: "9", location: 140, disease: "Туберозный склероз, Опухоли головного мозга, Почечные ангиомиолипомы", start: 5088990011, end: 5089001122, total: 11111 },
+            "TSC2": { chromosome: "16", location: 140, disease: "Туберозный склероз, Почечные кисты, Лимфангиолейомиоматоз", start: 5099001122, end: 5099112233, total: 11111 },
+            "VHL": { chromosome: "3", location: 140, disease: "Болезнь Гиппеля-Линдау, Почечно-клеточный рак, Феохромоцитома", start: 10140990, end: 10151174, total: 10184 },
+            "WT1": { chromosome: "11", location: 140, disease: "Опухоль Вильмса, Синдром Дениса-Драша, Синдром Фрайзера", start: 32467700, end: 32496247, total: 28547 },
+            "XPA": { chromosome: "9", location: 140, disease: "Пигментная ксеродерма", start: 5700112233, end: 5701223344, total: 11111 },
+            "XPC": { chromosome: "3", location: 140, disease: "Пигментная ксеродерма", start: 5711223344, end: 5712334455, total: 11111 },
+            "ZMPSTE24": { chromosome: "1", location: 140, disease: "Прогерия, Синдром Хатчинсона-Гилфорда", start: 5722334455, end: 5723445566, total: 11111 }
+        };
+
+        const chromosomeContainer = document.getElementById('chromosomeContainer');
+        const geneSearchInput = document.getElementById('geneSearch');
+        const searchButton = document.getElementById('searchButton');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const geneSelectButton = document.getElementById('geneSelectButton');
+        const geneSelectDropdown = document.getElementById('geneSelectDropdown');
+        const geneCardContainer = document.getElementById('geneCardContainer');
+        const panelSizeElement = document.getElementById('panelSize');
+
+        const diseaseSelectButton = document.getElementById('diseaseSelectButton');
+        const diseaseSelectDropdown = document.getElementById('diseaseSelectDropdown');
+
+        let totalPanelSize = 0; // Track total size
+        let activeGeneCards = {};  // Track active gene cards
+
+        // Функция для заполнения выпадающего списка генами
+        function populateGeneDropdown() {
+            for (const geneName in geneData) {
+                const geneLink = document.createElement('a');
+                geneLink.href = '#';
+                geneLink.textContent = geneName;
+                geneLink.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    annotateGene(geneName);
+                    geneSelectContainer.classList.remove('show');
+                });
+                geneSelectDropdown.appendChild(geneLink);
+            }
+        }
+
+        // Вызываем функцию для заполнения списка при загрузке страницы
+        populateGeneDropdown();
+
+        // Обработчик клика для кнопки выпадающего списка
+        const geneSelectContainer = document.querySelector('.gene-select-container');
+        geneSelectButton.addEventListener('click', (event) => {
+            geneSelectContainer.classList.toggle('show');
+        });
+
+          // Функция для заполнения выпадающего списка заболеваний
+        function populateDiseaseDropdown() {
+            const diseases = [...new Set(Object.values(geneData).map(gene => gene.disease))];
+            diseases.forEach(disease => {
+                const diseaseLink = document.createElement('a');
+                diseaseLink.href = '#';
+                diseaseLink.textContent = disease;
+                diseaseLink.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    // Добавьте здесь код для обработки выбора заболевания
+                    diseaseSelectContainer.classList.remove('show');
+                });
+                diseaseSelectDropdown.appendChild(diseaseLink);
+            });
+        }
+         // Вызываем функцию для заполнения списка заболеваний при загрузке страницы
+        populateDiseaseDropdown();
+
+         // Обработчик клика для кнопки выпадающего списка заболеваний
+        const diseaseSelectContainer = document.querySelector('.disease-select-container');
+        diseaseSelectButton.addEventListener('click', (event) => {
+            diseaseSelectContainer.classList.toggle('show');
+        });
+
+       function createGeneCard(geneName) {
+            const gene = geneData[geneName];
+
+            if (gene && !activeGeneCards[geneName]) {
+                const card = document.createElement('div');
+                card.classList.add('gene-card');
+                card.dataset.gene = geneName;
+
+                const closeButton = document.createElement('span');
+                closeButton.classList.add('close-button');
+                closeButton.innerHTML = '&times;';
+                closeButton.addEventListener('click', (event) => {
+                    event.stopPropagation(); // Предотвратить всплытие события
+                    console.log("Close button clicked for gene:", geneName); // Check if event triggers
+                    removeGeneCard(geneName);
+                });
+                card.appendChild(closeButton);
+
+                // Создаем элементы для информации о гене
+                const geneNameElement = document.createElement('strong');
+                geneNameElement.textContent = geneName;
+                const diseaseElement = document.createElement('div');
+                diseaseElement.textContent = `Disease: ${gene.disease}`;
+                const chromosomeElement = document.createElement('div');
+                chromosomeElement.textContent = `Chr: ${gene.chromosome}`;
+                const startElement = document.createElement('div');
+                startElement.textContent = `Start: ${gene.start}`;
+                const endElement = document.createElement('div');
+                endElement.textContent = `End: ${gene.end}`;
+                const totalElement = document.createElement('div');
+                totalElement.textContent = `Total: ${gene.total} bp`;
+
+                // Добавляем элементы в карточку
+                card.appendChild(geneNameElement);
+                card.appendChild(document.createElement('br')); // Добавляем перенос строки
+                card.appendChild(diseaseElement);
+                card.appendChild(chromosomeElement);
+                card.appendChild(startElement);
+                card.appendChild(endElement);
+                card.appendChild(totalElement);
+
+                geneCardContainer.appendChild(card);
+                activeGeneCards[geneName] = true;
+
+                updatePanelSize();
+            }
+        }
+
+        function removeGeneCard(geneName) {
+            console.log("removeGeneCard called for:", geneName);
+            const cardToRemove = document.querySelector(`.gene-card[data-gene="${geneName}"]`);
+
+            if (cardToRemove) {
+                console.log("Card found, removing:", cardToRemove);
+                geneCardContainer.removeChild(cardToRemove);
+                delete activeGeneCards[geneName];
+                updatePanelSize();
+            } else {
+                console.log("Card not found for:", geneName);
+            }
+        }
+
+        function updatePanelSize() {
+            totalPanelSize = Object.keys(activeGeneCards).reduce((sum, geneName) => {
+                return sum + geneData[geneName].total;
+            }, 0);
+            panelSizeElement.textContent = `Panel size: ${totalPanelSize}`;
+        }
+
+        function annotateGene(geneName) {
+            // Сначала очищаем предыдущие аннотации
+            const existingAnnotations = document.querySelectorAll('.gene-annotation');
+            existingAnnotations.forEach(annotation => annotation.remove());
+
+            const gene = geneData[geneName];
+
+            if (gene) {
+                const chromosomeElement = document.querySelector(`.chromosome[data-chromosome="${gene.chromosome}"]`);
+
+                if (chromosomeElement) {
+                    const annotation = document.createElement('div');
+                    annotation.classList.add('gene-annotation');
+
+                    // Формируем текст выноски
+                    let annotationText = `${geneName}: ${gene.disease}<br>`;
+                    annotationText += `Chr: ${gene.chromosome}<br>`;
+                    annotationText += `Start: ${gene.start}<br>`;
+                    annotationText += `End: ${gene.end}<br>`;
+                    annotationText += `Total: ${gene.total} bp`;
+
+                    annotation.innerHTML = annotationText; // Используем innerHTML для переноса строк
+
+                    // Вычисляем позицию выноски
+                    const chromosomeHeight = parseInt(chromosomeElement.style.height);
+                    const annotationPosition = (gene.location / 550) * chromosomeHeight; // Нормализуем к 550px
+
+                    annotation.style.top = `${annotationPosition}px`;
+                    chromosomeElement.appendChild(annotation);
+
+                    createGeneCard(geneName); // Creating a card
+                    updatePanelSize();
+                } else {
+                    alert(`Хромосома ${gene.chromosome} не найдена.`);
+                }
+            } else {
+                alert(`Ген ${geneName} не найден.`);
+            }
+        }
+
+        searchButton.addEventListener('click', () => {
+            const geneName = geneSearchInput.value.trim().toUpperCase();
+
+            if (geneName) {
+                loadingIndicator.style.display = 'block';
+                setTimeout(() => {
+                    annotateGene(geneName);
+                    loadingIndicator.style.display = 'none';
+                }, 500);
+            } else {
+                alert('Пожалуйста, введите название гена.');
+            }
+        });
+    </script>
+</body>
+</html>
